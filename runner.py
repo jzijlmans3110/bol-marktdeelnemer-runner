@@ -81,6 +81,10 @@ def list_operators(token: str) -> list[dict]:
         return json.loads(r.read()).get("operators", [])
 
 
+class ExportBusy(Exception):
+    pass
+
+
 def _request_export(token: str, name: str) -> str:
     H = {
         "Authorization": f"Bearer {token}",
@@ -102,7 +106,10 @@ def _request_export(token: str, name: str) -> str:
         if st.get("status") == "SUCCESS":
             return st["entityId"]
         if st.get("status") == "FAILURE":
-            raise RuntimeError(f"export FAIL: {st.get('errorMessage')}")
+            msg = st.get("errorMessage", "")
+            if "already active" in msg.lower() or "similar specification" in msg.lower():
+                raise ExportBusy(msg)
+            raise RuntimeError(f"export FAIL: {msg}")
         if i and i % 60 == 0:
             log(f"[{name}] export bezig na {i*3}s")
     raise RuntimeError("export timeout")
@@ -125,11 +132,17 @@ def _download_csv(token: str, rid: str, path: Path) -> int:
 
 
 def fresh_export(tm: TokenManager, name: str) -> Path:
-    for outer in range(1, 11):
+    busy_wait = 60
+    for outer in range(1, 21):
         log(f"[{name}] verse offer-export trekken (ronde {outer})")
         try:
             rid = _request_export(tm.get(), name)
             log(f"[{name}] export rid={rid}, CSV downloaden")
+        except ExportBusy as e:
+            log(f"[{name}] export busy ('{str(e)[:80]}'), wacht {busy_wait}s")
+            time.sleep(busy_wait)
+            busy_wait = min(busy_wait + 30, 300)
+            continue
         except urllib.error.HTTPError as e:
             log(f"[{name}] export-request {e.code}, wacht 90s")
             time.sleep(90)
@@ -143,7 +156,7 @@ def fresh_export(tm: TokenManager, name: str) -> Path:
                 log(f"[{name}] download faalde poging {attempt+1}: {type(e).__name__}: {str(e)[:120]}")
                 time.sleep(10 * (attempt + 1))
         time.sleep(60)
-    raise RuntimeError("export failed na 10 rondes")
+    raise RuntimeError("export failed na 20 rondes")
 
 
 def put_once(token: str, row: dict, op_id: str) -> tuple[int, str | None]:
@@ -205,6 +218,10 @@ def main() -> int:
         shard_n, shard_m = int(a), int(b)
 
     log(f"=== START {name} workers={n_workers} shard={shard or 'all'} ===")
+    if shard_n and shard_n > 0:
+        stagger = shard_n * 90
+        log(f"[{name}] stagger {stagger}s om export-conflict te vermijden")
+        time.sleep(stagger)
     tm = TokenManager(cid, csec)
     ops = [o for o in list_operators(tm.get()) if o.get("status") == "VALID"]
     if not ops:
