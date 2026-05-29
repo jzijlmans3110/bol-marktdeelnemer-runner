@@ -8,49 +8,77 @@ on:
         default: '20'
         type: string
       shards:
-        description: 'Aantal shards (= aantal parallel jobs)'
+        description: 'Aantal shards (2, 3 of 4)'
         default: '3'
-        type: choice
-        options:
-          - '2'
-          - '3'
-          - '4'
+        type: string
 
 jobs:
-  run:
+  shard-0:
     runs-on: ubuntu-latest
     timeout-minutes: 350
-    strategy:
-      fail-fast: false
-      matrix:
-        idx: [0, 1, 2, 3]
     steps:
-      - name: Skip if idx >= shards
-        if: ${{ matrix.idx >= fromJSON(inputs.shards) }}
-        run: echo "idx ${{ matrix.idx }} buiten shard-count ${{ inputs.shards }}, skip" && exit 0
-
       - uses: actions/checkout@v4
-        if: ${{ matrix.idx < fromJSON(inputs.shards) }}
-
       - uses: actions/setup-python@v5
-        if: ${{ matrix.idx < fromJSON(inputs.shards) }}
-        with:
-          python-version: '3.11'
-
-      - name: Install deps
-        if: ${{ matrix.idx < fromJSON(inputs.shards) }}
-        run: pip install -r requirements.txt
-
-      - name: Show egress IP
-        if: ${{ matrix.idx < fromJSON(inputs.shards) }}
-        run: curl -s ifconfig.me; echo
-
-      - name: Run marktdeelnemer (shard ${{ matrix.idx }}/${{ inputs.shards }})
-        if: ${{ matrix.idx < fromJSON(inputs.shards) }}
+        with: { python-version: '3.11' }
+      - run: pip install -r requirements.txt
+      - run: curl -s ifconfig.me; echo
+      - run: python runner.py
         env:
-          BOL_NAME: shard-${{ matrix.idx }}
-          BOL_SHARD: ${{ matrix.idx }}/${{ inputs.shards }}
+          BOL_NAME: shard-0
+          BOL_SHARD: 0/${{ inputs.shards }}
           BOL_WORKERS: ${{ inputs.workers }}
-          BOL_CLIENT_ID: ${{ matrix.idx == 0 && secrets.JORDY2_CLIENT_ID || matrix.idx == 1 && secrets.JORDY3_CLIENT_ID || secrets.JORDY4_CLIENT_ID }}
-          BOL_CLIENT_SECRET: ${{ matrix.idx == 0 && secrets.JORDY2_CLIENT_SECRET || matrix.idx == 1 && secrets.JORDY3_CLIENT_SECRET || secrets.JORDY4_CLIENT_SECRET }}
-        run: python runner.py
+          BOL_CLIENT_ID: ${{ secrets.JORDY2_CLIENT_ID }}
+          BOL_CLIENT_SECRET: ${{ secrets.JORDY2_CLIENT_SECRET }}
+
+  shard-1:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: pip install -r requirements.txt
+      - run: curl -s ifconfig.me; echo
+      - run: python runner.py
+        env:
+          BOL_NAME: shard-1
+          BOL_SHARD: 1/${{ inputs.shards }}
+          BOL_WORKERS: ${{ inputs.workers }}
+          BOL_CLIENT_ID: ${{ secrets.JORDY3_CLIENT_ID }}
+          BOL_CLIENT_SECRET: ${{ secrets.JORDY3_CLIENT_SECRET }}
+
+  shard-2:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    if: ${{ inputs.shards != '2' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: pip install -r requirements.txt
+      - run: curl -s ifconfig.me; echo
+      - run: python runner.py
+        env:
+          BOL_NAME: shard-2
+          BOL_SHARD: 2/${{ inputs.shards }}
+          BOL_WORKERS: ${{ inputs.workers }}
+          BOL_CLIENT_ID: ${{ secrets.JORDY4_CLIENT_ID }}
+          BOL_CLIENT_SECRET: ${{ secrets.JORDY4_CLIENT_SECRET }}
+
+  shard-3:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    if: ${{ inputs.shards == '4' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: pip install -r requirements.txt
+      - run: curl -s ifconfig.me; echo
+      - run: python runner.py
+        env:
+          BOL_NAME: shard-3
+          BOL_SHARD: 3/4
+          BOL_WORKERS: ${{ inputs.workers }}
+          BOL_CLIENT_ID: ${{ secrets.JORDY2_CLIENT_ID }}
+          BOL_CLIENT_SECRET: ${{ secrets.JORDY2_CLIENT_SECRET }}
