@@ -1,0 +1,56 @@
+name: bol-marktdeelnemer
+
+on:
+  workflow_dispatch:
+    inputs:
+      workers:
+        description: 'Parallel workers per shard'
+        default: '20'
+        type: string
+      shards:
+        description: 'Aantal shards (= aantal parallel jobs)'
+        default: '3'
+        type: choice
+        options:
+          - '2'
+          - '3'
+          - '4'
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    strategy:
+      fail-fast: false
+      matrix:
+        idx: [0, 1, 2, 3]
+    steps:
+      - name: Skip if idx >= shards
+        if: ${{ matrix.idx >= fromJSON(inputs.shards) }}
+        run: echo "idx ${{ matrix.idx }} buiten shard-count ${{ inputs.shards }}, skip" && exit 0
+
+      - uses: actions/checkout@v4
+        if: ${{ matrix.idx < fromJSON(inputs.shards) }}
+
+      - uses: actions/setup-python@v5
+        if: ${{ matrix.idx < fromJSON(inputs.shards) }}
+        with:
+          python-version: '3.11'
+
+      - name: Install deps
+        if: ${{ matrix.idx < fromJSON(inputs.shards) }}
+        run: pip install -r requirements.txt
+
+      - name: Show egress IP
+        if: ${{ matrix.idx < fromJSON(inputs.shards) }}
+        run: curl -s ifconfig.me; echo
+
+      - name: Run marktdeelnemer (shard ${{ matrix.idx }}/${{ inputs.shards }})
+        if: ${{ matrix.idx < fromJSON(inputs.shards) }}
+        env:
+          BOL_NAME: shard-${{ matrix.idx }}
+          BOL_SHARD: ${{ matrix.idx }}/${{ inputs.shards }}
+          BOL_WORKERS: ${{ inputs.workers }}
+          BOL_CLIENT_ID: ${{ matrix.idx == 0 && secrets.JORDY2_CLIENT_ID || matrix.idx == 1 && secrets.JORDY3_CLIENT_ID || secrets.JORDY4_CLIENT_ID }}
+          BOL_CLIENT_SECRET: ${{ matrix.idx == 0 && secrets.JORDY2_CLIENT_SECRET || matrix.idx == 1 && secrets.JORDY3_CLIENT_SECRET || secrets.JORDY4_CLIENT_SECRET }}
+        run: python runner.py
