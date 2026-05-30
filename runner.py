@@ -29,7 +29,7 @@ ACCEPT_RETAILER = "application/vnd.retailer.v10+json"
 ACCEPT_OPERATOR = "application/vnd.economic-operator.v1+json"
 ACCEPT_CSV = "application/vnd.retailer.v10+csv"
 
-CACHE = Path("/tmp/bol_export.csv") if os.name != "nt" else Path("./bol_export.csv")
+CACHE = Path(os.environ.get("BOL_CACHE_PATH", "./bol_export.csv"))
 TOKEN_TTL_SEC = 540
 PROGRESS_EVERY = 200
 
@@ -231,11 +231,10 @@ def main() -> int:
         a, b = shard.split("/")
         shard_n, shard_m = int(a), int(b)
 
-    log(f"=== START {name} workers={n_workers} shard={shard or 'all'} ===")
-    if shard_n and shard_n > 0:
-        stagger = shard_n * 90
-        log(f"[{name}] stagger {stagger}s om export-conflict te vermijden")
-        time.sleep(stagger)
+    fetch_only = os.environ.get("BOL_FETCH_ONLY", "") == "1"
+    use_cache = os.environ.get("BOL_USE_CACHE", "") == "1"
+
+    log(f"=== START {name} workers={n_workers} shard={shard or 'all'} fetch_only={fetch_only} use_cache={use_cache} ===")
     tm = TokenManager(cid, csec)
     ops = [o for o in list_operators(tm.get()) if o.get("status") == "VALID"]
     if not ops:
@@ -244,7 +243,13 @@ def main() -> int:
     op_id = ops[0]["id"]
     log(f"[{name}] operator: {ops[0].get('name')} ({op_id})")
 
-    fresh_export(tm, name)
+    if use_cache and CACHE.exists() and CACHE.stat().st_size > 0:
+        log(f"[{name}] CSV cache aanwezig: {CACHE.stat().st_size/1_000_000:.1f} MB, skip export")
+    else:
+        fresh_export(tm, name)
+    if fetch_only:
+        log(f"[{name}] fetch-only mode, klaar")
+        return 0
     with open(CACHE, encoding="utf-8") as f:
         rows = list(csv.DictReader(f))
     todo = [r for r in rows if not (r.get("economicOperatorId") or "").strip()]

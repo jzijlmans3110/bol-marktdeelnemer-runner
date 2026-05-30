@@ -17,15 +17,40 @@ on:
         type: string
 
 jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: pip install -r requirements.txt
+      - name: Pull Bol CSV export
+        env:
+          BOL_NAME: fetch
+          BOL_FETCH_ONLY: '1'
+          BOL_CLIENT_ID: ${{ secrets.JORDY1_CLIENT_ID }}
+          BOL_CLIENT_SECRET: ${{ secrets.JORDY1_CLIENT_SECRET }}
+        run: python runner.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bol-csv
+          path: ./bol_export.csv
+          retention-days: 1
+
   s0:
     runs-on: ubuntu-latest
     timeout-minutes: 350
+    needs: fetch
     if: ${{ fromJSON(inputs.shards) >= 1 }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: '3.11' }
       - run: pip install -r requirements.txt
+      - uses: actions/download-artifact@v4
+        with:
+          name: bol-csv
       - run: curl -s ifconfig.me; echo
       - run: python runner.py
         env:
@@ -33,18 +58,23 @@ jobs:
           BOL_SHARD: 0/${{ inputs.shards }}
           BOL_WORKERS: ${{ inputs.workers }}
           BOL_429_BACKOFF: ${{ inputs.backoff }}
+          BOL_USE_CACHE: '1'
           BOL_CLIENT_ID: ${{ secrets.JORDY1_CLIENT_ID }}
           BOL_CLIENT_SECRET: ${{ secrets.JORDY1_CLIENT_SECRET }}
 
   s1:
     runs-on: ubuntu-latest
     timeout-minutes: 350
+    needs: fetch
     if: ${{ fromJSON(inputs.shards) >= 2 }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: '3.11' }
       - run: pip install -r requirements.txt
+      - uses: actions/download-artifact@v4
+        with:
+          name: bol-csv
       - run: curl -s ifconfig.me; echo
       - run: python runner.py
         env:
@@ -52,18 +82,23 @@ jobs:
           BOL_SHARD: 1/${{ inputs.shards }}
           BOL_WORKERS: ${{ inputs.workers }}
           BOL_429_BACKOFF: ${{ inputs.backoff }}
+          BOL_USE_CACHE: '1'
           BOL_CLIENT_ID: ${{ secrets.JORDY2_CLIENT_ID }}
           BOL_CLIENT_SECRET: ${{ secrets.JORDY2_CLIENT_SECRET }}
 
   s2:
     runs-on: ubuntu-latest
     timeout-minutes: 350
+    needs: fetch
     if: ${{ fromJSON(inputs.shards) >= 3 }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: '3.11' }
       - run: pip install -r requirements.txt
+      - uses: actions/download-artifact@v4
+        with:
+          name: bol-csv
       - run: curl -s ifconfig.me; echo
       - run: python runner.py
         env:
@@ -71,18 +106,23 @@ jobs:
           BOL_SHARD: 2/${{ inputs.shards }}
           BOL_WORKERS: ${{ inputs.workers }}
           BOL_429_BACKOFF: ${{ inputs.backoff }}
+          BOL_USE_CACHE: '1'
           BOL_CLIENT_ID: ${{ secrets.JORDY3_CLIENT_ID }}
           BOL_CLIENT_SECRET: ${{ secrets.JORDY3_CLIENT_SECRET }}
 
   s3:
     runs-on: ubuntu-latest
     timeout-minutes: 350
+    needs: fetch
     if: ${{ fromJSON(inputs.shards) >= 4 }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: '3.11' }
       - run: pip install -r requirements.txt
+      - uses: actions/download-artifact@v4
+        with:
+          name: bol-csv
       - run: curl -s ifconfig.me; echo
       - run: python runner.py
         env:
@@ -90,18 +130,23 @@ jobs:
           BOL_SHARD: 3/${{ inputs.shards }}
           BOL_WORKERS: ${{ inputs.workers }}
           BOL_429_BACKOFF: ${{ inputs.backoff }}
+          BOL_USE_CACHE: '1'
           BOL_CLIENT_ID: ${{ secrets.JORDY4_CLIENT_ID }}
           BOL_CLIENT_SECRET: ${{ secrets.JORDY4_CLIENT_SECRET }}
 
   s4:
     runs-on: ubuntu-latest
     timeout-minutes: 350
+    needs: fetch
     if: ${{ fromJSON(inputs.shards) >= 5 }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: '3.11' }
       - run: pip install -r requirements.txt
+      - uses: actions/download-artifact@v4
+        with:
+          name: bol-csv
       - run: curl -s ifconfig.me; echo
       - run: python runner.py
         env:
@@ -109,18 +154,23 @@ jobs:
           BOL_SHARD: 4/${{ inputs.shards }}
           BOL_WORKERS: ${{ inputs.workers }}
           BOL_429_BACKOFF: ${{ inputs.backoff }}
+          BOL_USE_CACHE: '1'
           BOL_CLIENT_ID: ${{ secrets.JORDY5_CLIENT_ID }}
           BOL_CLIENT_SECRET: ${{ secrets.JORDY5_CLIENT_SECRET }}
 
   s5:
     runs-on: ubuntu-latest
     timeout-minutes: 350
+    needs: fetch
     if: ${{ fromJSON(inputs.shards) >= 6 }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: '3.11' }
       - run: pip install -r requirements.txt
+      - uses: actions/download-artifact@v4
+        with:
+          name: bol-csv
       - run: curl -s ifconfig.me; echo
       - run: python runner.py
         env:
@@ -128,18 +178,23 @@ jobs:
           BOL_SHARD: 5/${{ inputs.shards }}
           BOL_WORKERS: ${{ inputs.workers }}
           BOL_429_BACKOFF: ${{ inputs.backoff }}
+          BOL_USE_CACHE: '1'
           BOL_CLIENT_ID: ${{ secrets.JORDY6_CLIENT_ID }}
           BOL_CLIENT_SECRET: ${{ secrets.JORDY6_CLIENT_SECRET }}
 
   s6:
     runs-on: ubuntu-latest
     timeout-minutes: 350
+    needs: fetch
     if: ${{ fromJSON(inputs.shards) >= 7 }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: '3.11' }
       - run: pip install -r requirements.txt
+      - uses: actions/download-artifact@v4
+        with:
+          name: bol-csv
       - run: curl -s ifconfig.me; echo
       - run: python runner.py
         env:
@@ -147,18 +202,23 @@ jobs:
           BOL_SHARD: 6/${{ inputs.shards }}
           BOL_WORKERS: ${{ inputs.workers }}
           BOL_429_BACKOFF: ${{ inputs.backoff }}
+          BOL_USE_CACHE: '1'
           BOL_CLIENT_ID: ${{ secrets.JORDY7_CLIENT_ID }}
           BOL_CLIENT_SECRET: ${{ secrets.JORDY7_CLIENT_SECRET }}
 
   s7:
     runs-on: ubuntu-latest
     timeout-minutes: 350
+    needs: fetch
     if: ${{ fromJSON(inputs.shards) >= 8 }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: '3.11' }
       - run: pip install -r requirements.txt
+      - uses: actions/download-artifact@v4
+        with:
+          name: bol-csv
       - run: curl -s ifconfig.me; echo
       - run: python runner.py
         env:
@@ -166,18 +226,23 @@ jobs:
           BOL_SHARD: 7/${{ inputs.shards }}
           BOL_WORKERS: ${{ inputs.workers }}
           BOL_429_BACKOFF: ${{ inputs.backoff }}
+          BOL_USE_CACHE: '1'
           BOL_CLIENT_ID: ${{ secrets.JORDY8_CLIENT_ID }}
           BOL_CLIENT_SECRET: ${{ secrets.JORDY8_CLIENT_SECRET }}
 
   s8:
     runs-on: ubuntu-latest
     timeout-minutes: 350
+    needs: fetch
     if: ${{ fromJSON(inputs.shards) >= 9 }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: '3.11' }
       - run: pip install -r requirements.txt
+      - uses: actions/download-artifact@v4
+        with:
+          name: bol-csv
       - run: curl -s ifconfig.me; echo
       - run: python runner.py
         env:
@@ -185,18 +250,23 @@ jobs:
           BOL_SHARD: 8/${{ inputs.shards }}
           BOL_WORKERS: ${{ inputs.workers }}
           BOL_429_BACKOFF: ${{ inputs.backoff }}
+          BOL_USE_CACHE: '1'
           BOL_CLIENT_ID: ${{ secrets.JORDY9_CLIENT_ID }}
           BOL_CLIENT_SECRET: ${{ secrets.JORDY9_CLIENT_SECRET }}
 
   s9:
     runs-on: ubuntu-latest
     timeout-minutes: 350
+    needs: fetch
     if: ${{ fromJSON(inputs.shards) >= 10 }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: '3.11' }
       - run: pip install -r requirements.txt
+      - uses: actions/download-artifact@v4
+        with:
+          name: bol-csv
       - run: curl -s ifconfig.me; echo
       - run: python runner.py
         env:
@@ -204,18 +274,23 @@ jobs:
           BOL_SHARD: 9/${{ inputs.shards }}
           BOL_WORKERS: ${{ inputs.workers }}
           BOL_429_BACKOFF: ${{ inputs.backoff }}
+          BOL_USE_CACHE: '1'
           BOL_CLIENT_ID: ${{ secrets.JORDY10_CLIENT_ID }}
           BOL_CLIENT_SECRET: ${{ secrets.JORDY10_CLIENT_SECRET }}
 
   s10:
     runs-on: ubuntu-latest
     timeout-minutes: 350
+    needs: fetch
     if: ${{ fromJSON(inputs.shards) >= 11 }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: '3.11' }
       - run: pip install -r requirements.txt
+      - uses: actions/download-artifact@v4
+        with:
+          name: bol-csv
       - run: curl -s ifconfig.me; echo
       - run: python runner.py
         env:
@@ -223,18 +298,23 @@ jobs:
           BOL_SHARD: 10/${{ inputs.shards }}
           BOL_WORKERS: ${{ inputs.workers }}
           BOL_429_BACKOFF: ${{ inputs.backoff }}
+          BOL_USE_CACHE: '1'
           BOL_CLIENT_ID: ${{ secrets.JORDY11_CLIENT_ID }}
           BOL_CLIENT_SECRET: ${{ secrets.JORDY11_CLIENT_SECRET }}
 
   s11:
     runs-on: ubuntu-latest
     timeout-minutes: 350
+    needs: fetch
     if: ${{ fromJSON(inputs.shards) >= 12 }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: '3.11' }
       - run: pip install -r requirements.txt
+      - uses: actions/download-artifact@v4
+        with:
+          name: bol-csv
       - run: curl -s ifconfig.me; echo
       - run: python runner.py
         env:
@@ -242,18 +322,23 @@ jobs:
           BOL_SHARD: 11/${{ inputs.shards }}
           BOL_WORKERS: ${{ inputs.workers }}
           BOL_429_BACKOFF: ${{ inputs.backoff }}
+          BOL_USE_CACHE: '1'
           BOL_CLIENT_ID: ${{ secrets.JORDY12_CLIENT_ID }}
           BOL_CLIENT_SECRET: ${{ secrets.JORDY12_CLIENT_SECRET }}
 
   s12:
     runs-on: ubuntu-latest
     timeout-minutes: 350
+    needs: fetch
     if: ${{ fromJSON(inputs.shards) >= 13 }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: '3.11' }
       - run: pip install -r requirements.txt
+      - uses: actions/download-artifact@v4
+        with:
+          name: bol-csv
       - run: curl -s ifconfig.me; echo
       - run: python runner.py
         env:
@@ -261,18 +346,23 @@ jobs:
           BOL_SHARD: 12/${{ inputs.shards }}
           BOL_WORKERS: ${{ inputs.workers }}
           BOL_429_BACKOFF: ${{ inputs.backoff }}
+          BOL_USE_CACHE: '1'
           BOL_CLIENT_ID: ${{ secrets.JORDY13_CLIENT_ID }}
           BOL_CLIENT_SECRET: ${{ secrets.JORDY13_CLIENT_SECRET }}
 
   s13:
     runs-on: ubuntu-latest
     timeout-minutes: 350
+    needs: fetch
     if: ${{ fromJSON(inputs.shards) >= 14 }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: '3.11' }
       - run: pip install -r requirements.txt
+      - uses: actions/download-artifact@v4
+        with:
+          name: bol-csv
       - run: curl -s ifconfig.me; echo
       - run: python runner.py
         env:
@@ -280,18 +370,23 @@ jobs:
           BOL_SHARD: 13/${{ inputs.shards }}
           BOL_WORKERS: ${{ inputs.workers }}
           BOL_429_BACKOFF: ${{ inputs.backoff }}
+          BOL_USE_CACHE: '1'
           BOL_CLIENT_ID: ${{ secrets.JORDY14_CLIENT_ID }}
           BOL_CLIENT_SECRET: ${{ secrets.JORDY14_CLIENT_SECRET }}
 
   s14:
     runs-on: ubuntu-latest
     timeout-minutes: 350
+    needs: fetch
     if: ${{ fromJSON(inputs.shards) >= 15 }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: '3.11' }
       - run: pip install -r requirements.txt
+      - uses: actions/download-artifact@v4
+        with:
+          name: bol-csv
       - run: curl -s ifconfig.me; echo
       - run: python runner.py
         env:
@@ -299,18 +394,23 @@ jobs:
           BOL_SHARD: 14/${{ inputs.shards }}
           BOL_WORKERS: ${{ inputs.workers }}
           BOL_429_BACKOFF: ${{ inputs.backoff }}
+          BOL_USE_CACHE: '1'
           BOL_CLIENT_ID: ${{ secrets.JORDY15_CLIENT_ID }}
           BOL_CLIENT_SECRET: ${{ secrets.JORDY15_CLIENT_SECRET }}
 
   s15:
     runs-on: ubuntu-latest
     timeout-minutes: 350
+    needs: fetch
     if: ${{ fromJSON(inputs.shards) >= 16 }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: '3.11' }
       - run: pip install -r requirements.txt
+      - uses: actions/download-artifact@v4
+        with:
+          name: bol-csv
       - run: curl -s ifconfig.me; echo
       - run: python runner.py
         env:
@@ -318,6 +418,7 @@ jobs:
           BOL_SHARD: 15/${{ inputs.shards }}
           BOL_WORKERS: ${{ inputs.workers }}
           BOL_429_BACKOFF: ${{ inputs.backoff }}
+          BOL_USE_CACHE: '1'
           BOL_CLIENT_ID: ${{ secrets.JORDY16_CLIENT_ID }}
           BOL_CLIENT_SECRET: ${{ secrets.JORDY16_CLIENT_SECRET }}
 
