@@ -8,8 +8,8 @@ on:
         default: '25'
         type: string
       shards:
-        description: 'Aantal shards (1-12)'
-        default: '6'
+        description: 'Aantal shards'
+        default: '15'
         type: string
       backoff:
         description: '429 backoff seconds'
@@ -90,8 +90,8 @@ jobs:
           BOL_SHARD: 3/${{ inputs.shards }}
           BOL_WORKERS: ${{ inputs.workers }}
           BOL_429_BACKOFF: ${{ inputs.backoff }}
-          BOL_CLIENT_ID: ${{ secrets.JORDY2_CLIENT_ID }}
-          BOL_CLIENT_SECRET: ${{ secrets.JORDY2_CLIENT_SECRET }}
+          BOL_CLIENT_ID: ${{ secrets.JORDY5_CLIENT_ID }}
+          BOL_CLIENT_SECRET: ${{ secrets.JORDY5_CLIENT_SECRET }}
 
   s4:
     runs-on: ubuntu-latest
@@ -109,8 +109,8 @@ jobs:
           BOL_SHARD: 4/${{ inputs.shards }}
           BOL_WORKERS: ${{ inputs.workers }}
           BOL_429_BACKOFF: ${{ inputs.backoff }}
-          BOL_CLIENT_ID: ${{ secrets.JORDY3_CLIENT_ID }}
-          BOL_CLIENT_SECRET: ${{ secrets.JORDY3_CLIENT_SECRET }}
+          BOL_CLIENT_ID: ${{ secrets.JORDY6_CLIENT_ID }}
+          BOL_CLIENT_SECRET: ${{ secrets.JORDY6_CLIENT_SECRET }}
 
   s5:
     runs-on: ubuntu-latest
@@ -128,8 +128,8 @@ jobs:
           BOL_SHARD: 5/${{ inputs.shards }}
           BOL_WORKERS: ${{ inputs.workers }}
           BOL_429_BACKOFF: ${{ inputs.backoff }}
-          BOL_CLIENT_ID: ${{ secrets.JORDY4_CLIENT_ID }}
-          BOL_CLIENT_SECRET: ${{ secrets.JORDY4_CLIENT_SECRET }}
+          BOL_CLIENT_ID: ${{ secrets.JORDY7_CLIENT_ID }}
+          BOL_CLIENT_SECRET: ${{ secrets.JORDY7_CLIENT_SECRET }}
 
   s6:
     runs-on: ubuntu-latest
@@ -147,8 +147,8 @@ jobs:
           BOL_SHARD: 6/${{ inputs.shards }}
           BOL_WORKERS: ${{ inputs.workers }}
           BOL_429_BACKOFF: ${{ inputs.backoff }}
-          BOL_CLIENT_ID: ${{ secrets.JORDY2_CLIENT_ID }}
-          BOL_CLIENT_SECRET: ${{ secrets.JORDY2_CLIENT_SECRET }}
+          BOL_CLIENT_ID: ${{ secrets.JORDY8_CLIENT_ID }}
+          BOL_CLIENT_SECRET: ${{ secrets.JORDY8_CLIENT_SECRET }}
 
   s7:
     runs-on: ubuntu-latest
@@ -166,8 +166,8 @@ jobs:
           BOL_SHARD: 7/${{ inputs.shards }}
           BOL_WORKERS: ${{ inputs.workers }}
           BOL_429_BACKOFF: ${{ inputs.backoff }}
-          BOL_CLIENT_ID: ${{ secrets.JORDY3_CLIENT_ID }}
-          BOL_CLIENT_SECRET: ${{ secrets.JORDY3_CLIENT_SECRET }}
+          BOL_CLIENT_ID: ${{ secrets.JORDY9_CLIENT_ID }}
+          BOL_CLIENT_SECRET: ${{ secrets.JORDY9_CLIENT_SECRET }}
 
   s8:
     runs-on: ubuntu-latest
@@ -185,8 +185,8 @@ jobs:
           BOL_SHARD: 8/${{ inputs.shards }}
           BOL_WORKERS: ${{ inputs.workers }}
           BOL_429_BACKOFF: ${{ inputs.backoff }}
-          BOL_CLIENT_ID: ${{ secrets.JORDY4_CLIENT_ID }}
-          BOL_CLIENT_SECRET: ${{ secrets.JORDY4_CLIENT_SECRET }}
+          BOL_CLIENT_ID: ${{ secrets.JORDY10_CLIENT_ID }}
+          BOL_CLIENT_SECRET: ${{ secrets.JORDY10_CLIENT_SECRET }}
 
   s9:
     runs-on: ubuntu-latest
@@ -204,8 +204,8 @@ jobs:
           BOL_SHARD: 9/${{ inputs.shards }}
           BOL_WORKERS: ${{ inputs.workers }}
           BOL_429_BACKOFF: ${{ inputs.backoff }}
-          BOL_CLIENT_ID: ${{ secrets.JORDY2_CLIENT_ID }}
-          BOL_CLIENT_SECRET: ${{ secrets.JORDY2_CLIENT_SECRET }}
+          BOL_CLIENT_ID: ${{ secrets.JORDY11_CLIENT_ID }}
+          BOL_CLIENT_SECRET: ${{ secrets.JORDY11_CLIENT_SECRET }}
 
   s10:
     runs-on: ubuntu-latest
@@ -223,8 +223,8 @@ jobs:
           BOL_SHARD: 10/${{ inputs.shards }}
           BOL_WORKERS: ${{ inputs.workers }}
           BOL_429_BACKOFF: ${{ inputs.backoff }}
-          BOL_CLIENT_ID: ${{ secrets.JORDY3_CLIENT_ID }}
-          BOL_CLIENT_SECRET: ${{ secrets.JORDY3_CLIENT_SECRET }}
+          BOL_CLIENT_ID: ${{ secrets.JORDY12_CLIENT_ID }}
+          BOL_CLIENT_SECRET: ${{ secrets.JORDY12_CLIENT_SECRET }}
 
   s11:
     runs-on: ubuntu-latest
@@ -242,5 +242,63 @@ jobs:
           BOL_SHARD: 11/${{ inputs.shards }}
           BOL_WORKERS: ${{ inputs.workers }}
           BOL_429_BACKOFF: ${{ inputs.backoff }}
-          BOL_CLIENT_ID: ${{ secrets.JORDY4_CLIENT_ID }}
-          BOL_CLIENT_SECRET: ${{ secrets.JORDY4_CLIENT_SECRET }}
+          BOL_CLIENT_ID: ${{ secrets.JORDY13_CLIENT_ID }}
+          BOL_CLIENT_SECRET: ${{ secrets.JORDY13_CLIENT_SECRET }}
+
+  s12:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    if: ${{ fromJSON(inputs.shards) >= 13 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: pip install -r requirements.txt
+      - run: curl -s ifconfig.me; echo
+      - run: python runner.py
+        env:
+          BOL_NAME: s12
+          BOL_SHARD: 12/${{ inputs.shards }}
+          BOL_WORKERS: ${{ inputs.workers }}
+          BOL_429_BACKOFF: ${{ inputs.backoff }}
+          BOL_CLIENT_ID: ${{ secrets.JORDY14_CLIENT_ID }}
+          BOL_CLIENT_SECRET: ${{ secrets.JORDY14_CLIENT_SECRET }}
+
+  s13:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    if: ${{ fromJSON(inputs.shards) >= 14 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: pip install -r requirements.txt
+      - run: curl -s ifconfig.me; echo
+      - run: python runner.py
+        env:
+          BOL_NAME: s13
+          BOL_SHARD: 13/${{ inputs.shards }}
+          BOL_WORKERS: ${{ inputs.workers }}
+          BOL_429_BACKOFF: ${{ inputs.backoff }}
+          BOL_CLIENT_ID: ${{ secrets.JORDY15_CLIENT_ID }}
+          BOL_CLIENT_SECRET: ${{ secrets.JORDY15_CLIENT_SECRET }}
+
+  s14:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    if: ${{ fromJSON(inputs.shards) >= 15 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: pip install -r requirements.txt
+      - run: curl -s ifconfig.me; echo
+      - run: python runner.py
+        env:
+          BOL_NAME: s14
+          BOL_SHARD: 14/${{ inputs.shards }}
+          BOL_WORKERS: ${{ inputs.workers }}
+          BOL_429_BACKOFF: ${{ inputs.backoff }}
+          BOL_CLIENT_ID: ${{ secrets.JORDY16_CLIENT_ID }}
+          BOL_CLIENT_SECRET: ${{ secrets.JORDY16_CLIENT_SECRET }}
+
