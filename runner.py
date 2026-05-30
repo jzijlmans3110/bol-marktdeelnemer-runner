@@ -193,7 +193,7 @@ def put_once(token: str, row: dict, op_id: str) -> tuple[int, str | None]:
             f"{API}/retailer/offers/{row['offerId']}",
             headers=H, json=body, timeout=(10, 45),
         )
-        if r.status_code == 200:
+        if 200 <= r.status_code < 300:
             return 200, None
         return r.status_code, r.text[:200]
     except Exception as e:
