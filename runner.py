@@ -159,6 +159,20 @@ def fresh_export(tm: TokenManager, name: str) -> Path:
     raise RuntimeError("export failed na 20 rondes")
 
 
+_session_local = threading.local()
+
+
+def _session():
+    import requests
+    s = getattr(_session_local, "s", None)
+    if s is None:
+        s = requests.Session()
+        adapter = requests.adapters.HTTPAdapter(pool_connections=50, pool_maxsize=50, max_retries=0)
+        s.mount("https://", adapter)
+        _session_local.s = s
+    return s
+
+
 def put_once(token: str, row: dict, op_id: str) -> tuple[int, str | None]:
     H = {
         "Authorization": f"Bearer {token}",
@@ -175,18 +189,18 @@ def put_once(token: str, row: dict, op_id: str) -> tuple[int, str | None]:
         "economicOperatorId": op_id,
     }
     try:
-        req = urllib.request.Request(
+        r = _session().put(
             f"{API}/retailer/offers/{row['offerId']}",
-            method="PUT", headers=H,
-            data=json.dumps(body).encode(),
+            headers=H, json=body, timeout=(10, 45),
         )
-        with urllib.request.urlopen(req, timeout=45) as r:
-            r.read()
+        if r.status_code == 200:
             return 200, None
-    except urllib.error.HTTPError as e:
-        return e.code, e.read().decode()[:200]
+        return r.status_code, r.text[:200]
     except Exception as e:
         return 0, str(e)
+
+
+_429_BACKOFF = float(os.environ.get("BOL_429_BACKOFF", "5"))
 
 
 def worker(row: dict, tm: TokenManager, op_id: str) -> tuple[dict, int, str | None]:
@@ -196,7 +210,7 @@ def worker(row: dict, tm: TokenManager, op_id: str) -> tuple[dict, int, str | No
         token = tm.force_refresh()
         status, err = put_once(token, row, op_id)
     if status == 429:
-        time.sleep(20)
+        time.sleep(_429_BACKOFF)
         status, err = put_once(tm.get(), row, op_id)
     if status == 0 and err:
         time.sleep(2)
