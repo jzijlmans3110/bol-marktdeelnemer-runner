@@ -3,3 +3,5 @@ __pycache__/
 *.db
 .env
 secrets.json
+set_*_secrets.sh
+*_secrets.sh
