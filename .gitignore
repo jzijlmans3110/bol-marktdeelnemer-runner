@@ -5,3 +5,4 @@ __pycache__/
 secrets.json
 set_*_secrets.sh
 *_secrets.sh
+datamodel_v10_nl.json

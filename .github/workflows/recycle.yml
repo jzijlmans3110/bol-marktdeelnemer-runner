@@ -1,0 +1,414 @@
+name: bol-recycle-jordy
+on:
+  workflow_dispatch:
+    inputs:
+      workers:
+        description: 'workers per shard'
+        default: '8'
+        type: string
+      shards:
+        description: 'aantal shards'
+        default: '16'
+        type: string
+
+jobs:
+  s0:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    if: ${{ fromJSON(inputs.shards) >= 1 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: pip install -r requirements.txt
+      - run: curl -s -o datamodel_v10_nl.json https://productdatamodel.s-bol.com/v10/datamodel_v10_nl.json
+      - run: python recycle_runner.py
+        env:
+          BOL_NAME: s0
+          BOL_SHARD: 0/${{ inputs.shards }}
+          BOL_WORKERS: ${{ inputs.workers }}
+          BOL_USE_CACHE: '1'
+          BOL_CACHE_PATH: recycle_list_jordy.csv
+          BOL_CLIENT_ID: ${{ secrets.JORDY1_CLIENT_ID }}
+          BOL_CLIENT_SECRET: ${{ secrets.JORDY1_CLIENT_SECRET }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: recycle-done-s0
+          path: recycle_done_s0.csv
+          retention-days: 5
+  s1:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    if: ${{ fromJSON(inputs.shards) >= 2 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: pip install -r requirements.txt
+      - run: curl -s -o datamodel_v10_nl.json https://productdatamodel.s-bol.com/v10/datamodel_v10_nl.json
+      - run: python recycle_runner.py
+        env:
+          BOL_NAME: s1
+          BOL_SHARD: 1/${{ inputs.shards }}
+          BOL_WORKERS: ${{ inputs.workers }}
+          BOL_USE_CACHE: '1'
+          BOL_CACHE_PATH: recycle_list_jordy.csv
+          BOL_CLIENT_ID: ${{ secrets.JORDY2_CLIENT_ID }}
+          BOL_CLIENT_SECRET: ${{ secrets.JORDY2_CLIENT_SECRET }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: recycle-done-s1
+          path: recycle_done_s1.csv
+          retention-days: 5
+  s2:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    if: ${{ fromJSON(inputs.shards) >= 3 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: pip install -r requirements.txt
+      - run: curl -s -o datamodel_v10_nl.json https://productdatamodel.s-bol.com/v10/datamodel_v10_nl.json
+      - run: python recycle_runner.py
+        env:
+          BOL_NAME: s2
+          BOL_SHARD: 2/${{ inputs.shards }}
+          BOL_WORKERS: ${{ inputs.workers }}
+          BOL_USE_CACHE: '1'
+          BOL_CACHE_PATH: recycle_list_jordy.csv
+          BOL_CLIENT_ID: ${{ secrets.JORDY3_CLIENT_ID }}
+          BOL_CLIENT_SECRET: ${{ secrets.JORDY3_CLIENT_SECRET }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: recycle-done-s2
+          path: recycle_done_s2.csv
+          retention-days: 5
+  s3:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    if: ${{ fromJSON(inputs.shards) >= 4 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: pip install -r requirements.txt
+      - run: curl -s -o datamodel_v10_nl.json https://productdatamodel.s-bol.com/v10/datamodel_v10_nl.json
+      - run: python recycle_runner.py
+        env:
+          BOL_NAME: s3
+          BOL_SHARD: 3/${{ inputs.shards }}
+          BOL_WORKERS: ${{ inputs.workers }}
+          BOL_USE_CACHE: '1'
+          BOL_CACHE_PATH: recycle_list_jordy.csv
+          BOL_CLIENT_ID: ${{ secrets.JORDY4_CLIENT_ID }}
+          BOL_CLIENT_SECRET: ${{ secrets.JORDY4_CLIENT_SECRET }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: recycle-done-s3
+          path: recycle_done_s3.csv
+          retention-days: 5
+  s4:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    if: ${{ fromJSON(inputs.shards) >= 5 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: pip install -r requirements.txt
+      - run: curl -s -o datamodel_v10_nl.json https://productdatamodel.s-bol.com/v10/datamodel_v10_nl.json
+      - run: python recycle_runner.py
+        env:
+          BOL_NAME: s4
+          BOL_SHARD: 4/${{ inputs.shards }}
+          BOL_WORKERS: ${{ inputs.workers }}
+          BOL_USE_CACHE: '1'
+          BOL_CACHE_PATH: recycle_list_jordy.csv
+          BOL_CLIENT_ID: ${{ secrets.JORDY5_CLIENT_ID }}
+          BOL_CLIENT_SECRET: ${{ secrets.JORDY5_CLIENT_SECRET }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: recycle-done-s4
+          path: recycle_done_s4.csv
+          retention-days: 5
+  s5:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    if: ${{ fromJSON(inputs.shards) >= 6 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: pip install -r requirements.txt
+      - run: curl -s -o datamodel_v10_nl.json https://productdatamodel.s-bol.com/v10/datamodel_v10_nl.json
+      - run: python recycle_runner.py
+        env:
+          BOL_NAME: s5
+          BOL_SHARD: 5/${{ inputs.shards }}
+          BOL_WORKERS: ${{ inputs.workers }}
+          BOL_USE_CACHE: '1'
+          BOL_CACHE_PATH: recycle_list_jordy.csv
+          BOL_CLIENT_ID: ${{ secrets.JORDY6_CLIENT_ID }}
+          BOL_CLIENT_SECRET: ${{ secrets.JORDY6_CLIENT_SECRET }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: recycle-done-s5
+          path: recycle_done_s5.csv
+          retention-days: 5
+  s6:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    if: ${{ fromJSON(inputs.shards) >= 7 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: pip install -r requirements.txt
+      - run: curl -s -o datamodel_v10_nl.json https://productdatamodel.s-bol.com/v10/datamodel_v10_nl.json
+      - run: python recycle_runner.py
+        env:
+          BOL_NAME: s6
+          BOL_SHARD: 6/${{ inputs.shards }}
+          BOL_WORKERS: ${{ inputs.workers }}
+          BOL_USE_CACHE: '1'
+          BOL_CACHE_PATH: recycle_list_jordy.csv
+          BOL_CLIENT_ID: ${{ secrets.JORDY7_CLIENT_ID }}
+          BOL_CLIENT_SECRET: ${{ secrets.JORDY7_CLIENT_SECRET }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: recycle-done-s6
+          path: recycle_done_s6.csv
+          retention-days: 5
+  s7:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    if: ${{ fromJSON(inputs.shards) >= 8 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: pip install -r requirements.txt
+      - run: curl -s -o datamodel_v10_nl.json https://productdatamodel.s-bol.com/v10/datamodel_v10_nl.json
+      - run: python recycle_runner.py
+        env:
+          BOL_NAME: s7
+          BOL_SHARD: 7/${{ inputs.shards }}
+          BOL_WORKERS: ${{ inputs.workers }}
+          BOL_USE_CACHE: '1'
+          BOL_CACHE_PATH: recycle_list_jordy.csv
+          BOL_CLIENT_ID: ${{ secrets.JORDY8_CLIENT_ID }}
+          BOL_CLIENT_SECRET: ${{ secrets.JORDY8_CLIENT_SECRET }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: recycle-done-s7
+          path: recycle_done_s7.csv
+          retention-days: 5
+  s8:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    if: ${{ fromJSON(inputs.shards) >= 9 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: pip install -r requirements.txt
+      - run: curl -s -o datamodel_v10_nl.json https://productdatamodel.s-bol.com/v10/datamodel_v10_nl.json
+      - run: python recycle_runner.py
+        env:
+          BOL_NAME: s8
+          BOL_SHARD: 8/${{ inputs.shards }}
+          BOL_WORKERS: ${{ inputs.workers }}
+          BOL_USE_CACHE: '1'
+          BOL_CACHE_PATH: recycle_list_jordy.csv
+          BOL_CLIENT_ID: ${{ secrets.JORDY9_CLIENT_ID }}
+          BOL_CLIENT_SECRET: ${{ secrets.JORDY9_CLIENT_SECRET }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: recycle-done-s8
+          path: recycle_done_s8.csv
+          retention-days: 5
+  s9:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    if: ${{ fromJSON(inputs.shards) >= 10 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: pip install -r requirements.txt
+      - run: curl -s -o datamodel_v10_nl.json https://productdatamodel.s-bol.com/v10/datamodel_v10_nl.json
+      - run: python recycle_runner.py
+        env:
+          BOL_NAME: s9
+          BOL_SHARD: 9/${{ inputs.shards }}
+          BOL_WORKERS: ${{ inputs.workers }}
+          BOL_USE_CACHE: '1'
+          BOL_CACHE_PATH: recycle_list_jordy.csv
+          BOL_CLIENT_ID: ${{ secrets.JORDY10_CLIENT_ID }}
+          BOL_CLIENT_SECRET: ${{ secrets.JORDY10_CLIENT_SECRET }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: recycle-done-s9
+          path: recycle_done_s9.csv
+          retention-days: 5
+  s10:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    if: ${{ fromJSON(inputs.shards) >= 11 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: pip install -r requirements.txt
+      - run: curl -s -o datamodel_v10_nl.json https://productdatamodel.s-bol.com/v10/datamodel_v10_nl.json
+      - run: python recycle_runner.py
+        env:
+          BOL_NAME: s10
+          BOL_SHARD: 10/${{ inputs.shards }}
+          BOL_WORKERS: ${{ inputs.workers }}
+          BOL_USE_CACHE: '1'
+          BOL_CACHE_PATH: recycle_list_jordy.csv
+          BOL_CLIENT_ID: ${{ secrets.JORDY11_CLIENT_ID }}
+          BOL_CLIENT_SECRET: ${{ secrets.JORDY11_CLIENT_SECRET }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: recycle-done-s10
+          path: recycle_done_s10.csv
+          retention-days: 5
+  s11:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    if: ${{ fromJSON(inputs.shards) >= 12 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: pip install -r requirements.txt
+      - run: curl -s -o datamodel_v10_nl.json https://productdatamodel.s-bol.com/v10/datamodel_v10_nl.json
+      - run: python recycle_runner.py
+        env:
+          BOL_NAME: s11
+          BOL_SHARD: 11/${{ inputs.shards }}
+          BOL_WORKERS: ${{ inputs.workers }}
+          BOL_USE_CACHE: '1'
+          BOL_CACHE_PATH: recycle_list_jordy.csv
+          BOL_CLIENT_ID: ${{ secrets.JORDY12_CLIENT_ID }}
+          BOL_CLIENT_SECRET: ${{ secrets.JORDY12_CLIENT_SECRET }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: recycle-done-s11
+          path: recycle_done_s11.csv
+          retention-days: 5
+  s12:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    if: ${{ fromJSON(inputs.shards) >= 13 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: pip install -r requirements.txt
+      - run: curl -s -o datamodel_v10_nl.json https://productdatamodel.s-bol.com/v10/datamodel_v10_nl.json
+      - run: python recycle_runner.py
+        env:
+          BOL_NAME: s12
+          BOL_SHARD: 12/${{ inputs.shards }}
+          BOL_WORKERS: ${{ inputs.workers }}
+          BOL_USE_CACHE: '1'
+          BOL_CACHE_PATH: recycle_list_jordy.csv
+          BOL_CLIENT_ID: ${{ secrets.JORDY13_CLIENT_ID }}
+          BOL_CLIENT_SECRET: ${{ secrets.JORDY13_CLIENT_SECRET }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: recycle-done-s12
+          path: recycle_done_s12.csv
+          retention-days: 5
+  s13:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    if: ${{ fromJSON(inputs.shards) >= 14 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: pip install -r requirements.txt
+      - run: curl -s -o datamodel_v10_nl.json https://productdatamodel.s-bol.com/v10/datamodel_v10_nl.json
+      - run: python recycle_runner.py
+        env:
+          BOL_NAME: s13
+          BOL_SHARD: 13/${{ inputs.shards }}
+          BOL_WORKERS: ${{ inputs.workers }}
+          BOL_USE_CACHE: '1'
+          BOL_CACHE_PATH: recycle_list_jordy.csv
+          BOL_CLIENT_ID: ${{ secrets.JORDY14_CLIENT_ID }}
+          BOL_CLIENT_SECRET: ${{ secrets.JORDY14_CLIENT_SECRET }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: recycle-done-s13
+          path: recycle_done_s13.csv
+          retention-days: 5
+  s14:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    if: ${{ fromJSON(inputs.shards) >= 15 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: pip install -r requirements.txt
+      - run: curl -s -o datamodel_v10_nl.json https://productdatamodel.s-bol.com/v10/datamodel_v10_nl.json
+      - run: python recycle_runner.py
+        env:
+          BOL_NAME: s14
+          BOL_SHARD: 14/${{ inputs.shards }}
+          BOL_WORKERS: ${{ inputs.workers }}
+          BOL_USE_CACHE: '1'
+          BOL_CACHE_PATH: recycle_list_jordy.csv
+          BOL_CLIENT_ID: ${{ secrets.JORDY15_CLIENT_ID }}
+          BOL_CLIENT_SECRET: ${{ secrets.JORDY15_CLIENT_SECRET }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: recycle-done-s14
+          path: recycle_done_s14.csv
+          retention-days: 5
+  s15:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    if: ${{ fromJSON(inputs.shards) >= 16 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: pip install -r requirements.txt
+      - run: curl -s -o datamodel_v10_nl.json https://productdatamodel.s-bol.com/v10/datamodel_v10_nl.json
+      - run: python recycle_runner.py
+        env:
+          BOL_NAME: s15
+          BOL_SHARD: 15/${{ inputs.shards }}
+          BOL_WORKERS: ${{ inputs.workers }}
+          BOL_USE_CACHE: '1'
+          BOL_CACHE_PATH: recycle_list_jordy.csv
+          BOL_CLIENT_ID: ${{ secrets.JORDY16_CLIENT_ID }}
+          BOL_CLIENT_SECRET: ${{ secrets.JORDY16_CLIENT_SECRET }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: recycle-done-s15
+          path: recycle_done_s15.csv
+          retention-days: 5

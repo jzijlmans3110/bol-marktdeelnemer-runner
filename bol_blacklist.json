@@ -1,0 +1,301 @@
+{
+  "version": "1.1.0",
+  "last_updated": "2026-05-27",
+  "changelog_v1_1": "False-positive fixes na scan 260k Jordy listings: 'duurzaam/duurzame' weg (NL = durable, niet sustainable); 'alternatief voor'/'namaak' weg (te breed); 'antibacterieel' van verboden naar hoog_risico; Halloween/Kerst/Sint/Vaderdag/Moederdag/Valentijn/Pasen naar hoog_risico want vaak productcategorie. Black Friday/Cyber Monday/Cyber week blijven verboden (puur promo).",
+  "description": "Master blacklist van verboden / risicovolle woorden in Bol.com producttitels. Gebaseerd op officiële Bol partnerplatform regels, ACM duurzaamheidsleidraad, en seller-ervaringen uit diverse bronnen. Severity bepaalt prioriteit: 'verboden' = directe puntenaftrek, 'hoog_risico' = vaak aftrek, 'medium' = grijs gebied, 'format' = stijl-regel.",
+  "sources": [
+    "https://partnerplatform.bol.com/en/need-help/productinformation/write-a-good-title/",
+    "https://partnerplatform.bol.com/en/need-help/productinformation/these-rules-apply-to-your-product-information/",
+    "https://partnerplatform.bol.com/en/need-help/performance/policy-points/product-and-content-deception/",
+    "https://partnerplatform.bol.com/nl/hulp-nodig/prestaties/beleidspunten/zelfpromotie/",
+    "https://partnerplatform.bol.com/nl/idp/deze-regels-gelden-voor-je-productinformatie",
+    "https://partnerplatform.bol.com/nl/idp/assortimentsbeleid-intellectueel-eigendom",
+    "https://partnerplatform.bol.com/en/need-help/offer/assortment-policy/important-to-know/sustainability/",
+    "https://partnerplatform.bol.com/nl/idp/assortimentsbeleid-gezondheid",
+    "https://www.acm.nl/nl/publicaties/om-misleiding-met-duurzaamheidsclaims-te-voorkomen-stelt-de-acm-regels-op",
+    "https://www.blenheim.nl/blog/beleidspunten-bol-juridische-uitleg/",
+    "https://platformprofessionals.nl/bulletin/hoe-werkt-het-beleidspuntensysteem-van-bol/",
+    "https://bolmate.nl/beleidspunten-bol-com-aftrek/",
+    "https://boloo.co/bibliotheek/hoe-schrijf-je-de-perfecte-titel-voor-bol-com"
+  ],
+  "categories": {
+    "promo_stunt": {
+      "severity": "verboden",
+      "max_points_deducted": 30,
+      "policy_category": "Product- en contentmisleiding",
+      "description": "Promotionele woorden, kortingstaal, stunt-formuleringen. Niet toegestaan in titel/omschrijving/afbeeldingen.",
+      "terms": [
+        "korting", "kortingen", "kortingsactie", "kortingsbon",
+        "discount", "deal", "deals", "topdeal", "topdeals",
+        "sale", "uitverkoop", "opruiming", "afgeprijsd",
+        "aanbieding", "aanbiedingen",
+        "voordeel", "voordelig", "voordelige", "voordeelpakket", "voordeelbundel",
+        "goedkoop", "goedkope", "cheap", "budget", "lowbudget", "low-budget",
+        "gratis", "free", "gratis verzending", "free shipping",
+        "1+1 gratis", "1+1gratis", "2+1 gratis", "2+1gratis", "3+1 gratis", "3+2 gratis",
+        "buy one get one free", "bogo",
+        "op=op", "op = op", "op is op", "while stocks last", "while supplies last",
+        "beste prijs", "laagste prijs", "lowest price", "best price",
+        "stunt", "stuntprijs", "stuntactie", "knaller", "topper",
+        "winactie", "win actie", "win-actie", "actiecode", "promocode", "kortingscode",
+        "nu tijdelijk", "nu met korting", "tijdelijk", "beperkt verkrijgbaar",
+        "exclusief aanbod", "exclusieve aanbieding",
+        "scherpe prijs", "scherp geprijsd",
+        "bespaar", "bespaar nu", "save now",
+        "klaverkoop", "outlet", "outlet prijs"
+      ]
+    },
+    "holiday_promo": {
+      "severity": "verboden",
+      "max_points_deducted": 30,
+      "policy_category": "Product- en contentmisleiding",
+      "description": "Promotie-only holiday terms (nooit een product). Black Friday/Cyber Monday zijn puur sales-events.",
+      "terms": [
+        "black friday", "blackfriday", "cyber monday", "cybermonday", "cyber week", "cyberweek",
+        "moederdag cadeau", "vaderdag cadeau", "verjaardagscadeau",
+        "kerst aanbieding", "kerst deal", "kerst sale", "halloween sale",
+        "valentijn aanbieding", "moederdag aanbieding"
+      ]
+    },
+    "holiday_seasonal": {
+      "severity": "hoog_risico",
+      "max_points_deducted": 30,
+      "policy_category": "Product- en contentmisleiding",
+      "description": "Holiday-namen die OOK productcategorie kunnen zijn (Halloween-masker = product, Halloween-sale = promo). Hoog_risico ipv verboden om false positives op productcategorieen te vermijden.",
+      "terms": [
+        "vaderdag", "father's day", "fathers day",
+        "moederdag", "mother's day", "mothers day",
+        "sinterklaas", "sint", "pakjesavond",
+        "kerst", "kerstmis", "kerstcadeau", "kerstpakket", "christmas", "xmas",
+        "valentijn", "valentijnsdag", "valentine", "valentines",
+        "pasen", "easter",
+        "halloween",
+        "koningsdag",
+        "nieuwjaar", "oud en nieuw"
+      ],
+      "_v1_1_note": "Verlaagd van verboden naar hoog_risico. Werkelijk verboden zijn alleen Black Friday/Cyber Monday/holiday+sale-combinaties (zie holiday_promo)."
+    },
+    "sustainability_vague": {
+      "severity": "verboden",
+      "max_points_deducted": 30,
+      "policy_category": "Product- en contentmisleiding + ACM greenwashing-regels",
+      "description": "ACM én Bol verbieden vage duurzaamheidsclaims. Alleen toegestaan: concrete claim met onderbouwing ('70% gerecycled materiaal').",
+      "terms": [
+        "milieuvriendelijk", "milieuvriendelijke", "milieu vriendelijk", "milieu vriendelijke", "milieubewust",
+        "eco", "eco-vriendelijk", "ecovriendelijk", "ecovriendelijke",
+        "ecologisch", "ecologische", "ecologie",
+        "vriend van de natuur", "natuurvriendelijk", "natuurvriendelijke",
+        "meest duurzaam", "duurzame keuze", "duurzaam materiaal", "duurzaam voor het milieu",
+        "goed voor het milieu", "vriendelijk voor het milieu",
+        "klimaatvriendelijk", "klimaatvriendelijke", "klimaatneutraal", "klimaatneutrale", "klimaatbewust",
+        "co2-neutraal", "co2 neutraal", "co2-neutrale", "co2-arm", "co2 arm",
+        "koolstofarm", "koolstof-arm", "koolstofvrij",
+        "verminderde co2-uitstoot", "lage co2", "low carbon", "low-carbon",
+        "niet vervuilend", "niet-vervuilend", "non-polluting",
+        "biologisch afbreekbaar", "biologisch-afbreekbaar", "biodegradable",
+        "emissievrij", "emissie-vrij", "emission-free",
+        "slaafvrij", "slave-free",
+        "bewust", "verantwoord", "verantwoorde keuze",
+        "environmentally friendly", "eco-friendly", "eco friendly",
+        "green", "sustainable", "conscious", "responsible", "natural friendly",
+        "100% groen", "100 procent groen", "100% natuurlijk",
+        "circulair", "circulaire", "circular economy",
+        "groen geproduceerd", "groene keuze"
+      ]
+    },
+    "health_medical": {
+      "severity": "verboden",
+      "max_points_deducted": 100,
+      "policy_category": "Product- en contentmisleiding + Verboden assortiment",
+      "description": "Niet-onderbouwde medische/gezondheidsclaims. Heel hoge aftrek mogelijk. EU 1924/2006 reguleert wat WEL mag.",
+      "terms": [
+        "geneest", "geneeskrachtig", "geneeskracht", "geneesmiddel",
+        "voorkomt ziekte", "voorkomt kanker", "voorkomt diabetes",
+        "behandelt", "behandeling van", "therapie",
+        "medicinaal", "medisch bewezen", "klinisch bewezen", "wetenschappelijk bewezen",
+        "anti-viraal", "antiviraal", "antiviral",
+        "anti-microbieel", "antimicrobieel",
+        "5g straling", "5g bescherming", "anti-5g",
+        "covid", "covid-19", "covid bescherming", "corona", "coronavirus",
+        "anti-aging gegarandeerd", "wrinkle-free guaranteed",
+        "snel afvallen", "afvallen gegarandeerd", "vetverbranding gegarandeerd",
+        "kg per week", "kilo per week",
+        "arts aanbevolen", "doctor recommended", "door artsen",
+        "100% natuurlijk genezend",
+        "verlicht pijn permanent", "permanente pijnverlichting",
+        "verhoogt immuniteit", "boost immuniteit"
+      ]
+    },
+    "delivery_price": {
+      "severity": "verboden",
+      "max_points_deducted": 30,
+      "policy_category": "Product- en contentmisleiding",
+      "description": "Levertijd-claims en prijsvermeldingen mogen niet in titel/content (prijs heeft eigen veld).",
+      "terms": [
+        "morgen in huis", "vandaag in huis", "morgen geleverd",
+        "snelle levering", "snelle bezorging", "snel verzonden",
+        "next day delivery", "next day", "express", "express bezorging",
+        "gratis bezorging", "free delivery",
+        "voor 22.00", "voor 23.00", "voor 23:59",
+        "voor 22:00 besteld", "voor 23:00 besteld",
+        "binnen 24 uur", "binnen 24u", "24h levering",
+        "same day", "same-day",
+        "direct leverbaar", "uit voorraad leverbaar"
+      ],
+      "regex_patterns": [
+        "€\\s?\\d+([,\\.]\\d{1,2})?",
+        "\\b\\d+([,\\.]\\d{1,2})?\\s?euro\\b",
+        "\\bvanaf\\s+€?\\s?\\d+",
+        "\\bvoor\\s+slechts\\s+€?\\s?\\d+"
+      ]
+    },
+    "brand_ip": {
+      "severity": "verboden",
+      "max_points_deducted": 100,
+      "policy_category": "Intellectueel eigendom + Imitatie (max 100 punten)",
+      "description": "Verwijzingen naar merken zonder toestemming. Alleen 'geschikt voor [merk]' is toegestaan bij accessoires (merknaam NIET in merkveld).",
+      "terms": [
+        "geïnspireerd door", "geinspireerd door", "inspired by",
+        "onze versie van", "our version of",
+        "onze impressie van", "our impression of",
+        "gebaseerd op het origineel", "based on the original",
+        "lijkend op het merk", "ziet eruit als het merk",
+        "similar to brand", "vergelijkbaar met merk",
+        "in de stijl van", "in stijl van", "style of brand",
+        "look-alike", "lookalike", "dupe van", "dupe of"
+      ],
+      "_removed_v1_1": ["alternatief voor", "alternative to", "vervanger voor", "namaak", "replica", "gebaseerd op", "based on", "lijkend op", "lijkt op", "vergelijkbaar met", "similar to", "ziet eruit als"],
+      "_removal_reason": "Te brede triggers; 'alternatief voor X' = generieke productvervanger, 'namaak X' = fake X (Halloween wonden, jade detector). Pas blokken als merknaam expliciet in titel."
+    },
+    "self_promotion": {
+      "severity": "verboden",
+      "max_points_deducted": 50,
+      "policy_category": "Zelfpromotie",
+      "description": "Verwijzingen naar eigen webshop, social media, of contact buiten Bol. Max 50 punten aftrek.",
+      "terms": [
+        "www.", "http://", "https://",
+        ".nl/", ".com/", ".be/", ".de/",
+        "bezoek onze", "bezoek de", "onze website", "onze webshop",
+        "onze winkel", "kijk op", "ga naar",
+        "instagram", "facebook", "tiktok",
+        "@gmail", "@hotmail", "@outlook",
+        "stuur ons", "mail ons", "neem contact op",
+        "abonneer", "nieuwsbrief",
+        "folder bijgesloten", "flyer bijgesloten"
+      ],
+      "regex_patterns": [
+        "\\bwww\\.[a-z0-9-]+\\.(nl|com|be|de|eu|net|org)\\b",
+        "\\bhttps?://\\S+",
+        "[a-z0-9._-]+@[a-z0-9.-]+\\.[a-z]{2,}"
+      ]
+    },
+    "symbols_special": {
+      "severity": "verboden",
+      "max_points_deducted": 10,
+      "policy_category": "Format-regels titel",
+      "description": "Bol verbiedt symbolen zoals ! ? & en decoratieve tekens (★ ❤ ✓ emoji's). Resulteert vaak in afkeur of aftrek.",
+      "terms": [
+        "★", "☆", "✦", "✪",
+        "♥", "❤", "❤️", "💖", "💕",
+        "✓", "✔", "✔️", "☑", "✅",
+        "🔥", "⭐", "💯", "💎", "🎁", "🎉",
+        "►", "▶", "◆", "■", "●"
+      ],
+      "forbidden_chars": ["!", "?", "&"],
+      "discouraged_chars": ["%", "#", "@", "$", "*", "~", "^", "|", "<", ">", "{", "}", "[", "]"],
+      "note": "Alleen !, ? en & zijn officieel door Bol genoemd. Andere tekens zijn niet aan te raden maar geen directe puntenaftrek."
+    },
+    "superlatives_strong": {
+      "severity": "hoog_risico",
+      "max_points_deducted": 30,
+      "policy_category": "Product- en contentmisleiding (overdrijving)",
+      "description": "Sterke superlatieven die echt misleidend zijn (nr.1, allerbeste, marktleider). Niet onderbouwbaar voor 99% van producten.",
+      "terms": [
+        "allerbeste", "the best", "best ever",
+        "topkwaliteit", "topproduct",
+        "ultra premium", "ultra luxe",
+        "nummer 1", "nummer een", "nr. 1", "nr.1", "#1", "no.1", "no. 1",
+        "meest verkocht", "best verkocht", "bestseller",
+        "wereldwijd nummer 1", "marktleider",
+        "revolutionair", "wereldprimeur"
+      ]
+    },
+    "superlatives_soft": {
+      "severity": "hoog_risico",
+      "max_points_deducted": 10,
+      "policy_category": "Product- en contentmisleiding (overdrijving)",
+      "description": "Zachte/gangbare overdrijvers. Bol kan ze flaggen maar zijn vaak fabricage-claims. Apart gehouden zodat user kan kiezen om ze door te laten.",
+      "terms": [
+        "beste",
+        "top",
+        "premium", "premium kwaliteit",
+        "luxe", "luxury",
+        "professional", "professioneel", "pro",
+        "grootste", "sterkste", "snelste", "langste",
+        "perfecte", "perfect", "ideale",
+        "uniek", "exclusief design"
+      ],
+      "_v1_1_note": "Afgesplitst van superlatives_strong; deze zijn vaak technisch correct (perfecte pasvorm, professioneel gereedschap)."
+    },
+    "format_capitalization": {
+      "severity": "format",
+      "max_points_deducted": 10,
+      "policy_category": "Format-regels titel",
+      "description": "Volledige woorden in HOOFDLETTERS zijn niet toegestaan (behalve geregistreerde merken/afkortingen ≤ 3 letters).",
+      "rules": {
+        "max_consecutive_uppercase_words": 1,
+        "allow_short_abbreviations_in_caps": true,
+        "max_abbreviation_length": 3
+      }
+    },
+    "format_length": {
+      "severity": "format",
+      "policy_category": "Format-regels titel",
+      "description": "Titel mag maximaal 70 tekens (inclusief spaties). Boven 70 = afkeur waarschijnlijk.",
+      "rules": {
+        "max_length": 70,
+        "warning_length": 60
+      }
+    },
+    "format_english_in_dutch": {
+      "severity": "format",
+      "policy_category": "Format-regels titel",
+      "description": "Engelse woorden vermijden in NL listings (uitzondering: technische/internationale termen).",
+      "common_english_to_flag": [
+        "for", "with", "the", "and", "or", "your", "this", "that", "these",
+        "best", "top", "premium", "luxury", "professional", "quality",
+        "high", "low", "new", "old", "small", "large", "big", "extra",
+        "easy", "fast", "quick", "powerful", "soft", "hard"
+      ]
+    }
+  },
+  "allowed_brand_phrases": {
+    "description": "Alleen 'geschikt voor [merk + type]' is toegestaan voor accessoires. Merk mag NIET in merkveld.",
+    "patterns": [
+      "geschikt voor",
+      "compatibel met",
+      "passend voor",
+      "voor gebruik met"
+    ]
+  },
+  "policy_points_system": {
+    "starting_points": 100,
+    "account_closure_at": 0,
+    "reset_period_days": 365,
+    "typical_deduction_range": [10, 100],
+    "most_common_deductions": [20, 50],
+    "categories_with_max": {
+      "Product- en contentmisleiding": 30,
+      "Intellectueel eigendom": 50,
+      "Zelfpromotie": 50,
+      "Ongewenst assortiment": 50,
+      "Ongepaste communicatie": 80,
+      "Ontduiken servicenormen": 60,
+      "Verboden assortiment": 100,
+      "Imitatie": 100,
+      "Fraude": 100,
+      "Levering buiten EU": 100,
+      "Andere overtredingen": 100
+    }
+  }
+}
