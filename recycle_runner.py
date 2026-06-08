@@ -210,7 +210,9 @@ def recycle_one(tm, op_id, dm, cleaner, row, blocked, ean_lock, rng):
     if ost.get("status") != "SUCCESS":
         return (ne, "offer_fail")
     offer_id = ost.get("entityId", "")
-    # marktdeelnemer
+    # marktdeelnemer (alleen als er een geldige operator is)
+    if not op_id:
+        return (ne, "done_no_op")
     put = {"reference": asin, "onHoldByRetailer": False,
            "fulfilment": {"method": "FBR", "deliveryCode": dcode},
            "economicOperatorId": op_id}
@@ -237,10 +239,13 @@ def main() -> int:
 
     tm = R.TokenManager(cid, csec)
     ops = [o for o in R.list_operators(tm.get()) if o.get("status") == "VALID"]
-    if not ops:
-        _log(f"[{name}] geen VALID operator"); return 1
-    op_id = ops[0]["id"]
-    _log(f"[{name}] operator {ops[0].get('name')} ({op_id})")
+    op_id = ops[0]["id"] if ops else None
+    if os.environ.get("BOL_SKIP_OPERATOR") == "1":
+        op_id = None
+    if op_id:
+        _log(f"[{name}] operator {ops[0].get('name')} ({op_id})")
+    else:
+        _log(f"[{name}] GEEN marktdeelnemer -> listings worden aangemaakt maar blijven 'niet te koop' tot operator gezet")
 
     if not (use_cache and R.CACHE.exists() and R.CACHE.stat().st_size > 0):
         R.fresh_export(tm, name)
@@ -284,7 +289,7 @@ def main() -> int:
         with log_lock:
             w.writerow([oe, ne, row.get("referenceCode", ""), st]); fout.flush()
             cnt["n"] += 1
-            if st == "done":
+            if st in ("done", "done_no_op"):
                 cnt["ok"] += 1
             if cnt["n"] % 50 == 0:
                 el = time.time() - started
