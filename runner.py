@@ -194,28 +194,42 @@ def put_once(token: str, row: dict, op_id: str) -> tuple[int, str | None]:
             headers=H, json=body, timeout=(10, 45),
         )
         if 200 <= r.status_code < 300:
-            return 200, None
-        return r.status_code, r.text[:200]
+            return 200, None, 0.0
+        ra = 0.0
+        try:
+            ra = float(r.headers.get("Retry-After", "0") or 0)
+        except ValueError:
+            ra = 0.0
+        return r.status_code, r.text[:200], ra
     except Exception as e:
-        return 0, str(e)
+        return 0, str(e), 0.0
 
 
 _429_BACKOFF = float(os.environ.get("BOL_429_BACKOFF", "5"))
+_MAX_ATTEMPTS = int(os.environ.get("BOL_MAX_ATTEMPTS", "10"))
 
 
 def worker(row: dict, tm: TokenManager, op_id: str) -> tuple[dict, int, str | None]:
-    token = tm.get()
-    status, err = put_once(token, row, op_id)
-    if status == 401:
-        token = tm.force_refresh()
-        status, err = put_once(token, row, op_id)
-    if status == 429:
-        time.sleep(_429_BACKOFF)
-        status, err = put_once(tm.get(), row, op_id)
-    if status == 0 and err:
-        time.sleep(2)
-        status, err = put_once(tm.get(), row, op_id)
-    return row, status, err
+    """Robuuste retry: 429/5xx/netwerk net zo lang opnieuw tot success of attempts op.
+    429 telt NIET als blijvende fout zolang er attempts over zijn."""
+    last_status, last_err = 0, None
+    for attempt in range(_MAX_ATTEMPTS):
+        status, err, ra = put_once(tm.get(), row, op_id)
+        if status == 200:
+            return row, 200, None
+        last_status, last_err = status, err
+        if status == 401:
+            tm.force_refresh()
+            continue
+        if status == 429:
+            wait = ra if ra > 0 else min(_429_BACKOFF * (attempt + 1), 30)
+            time.sleep(min(wait, 60))
+            continue
+        if status == 0 or status >= 500:       # netwerk / serverfout
+            time.sleep(min(2 + attempt * 2, 30))
+            continue
+        return row, status, err                # harde 4xx -> niet retryen
+    return row, last_status, last_err
 
 
 def main() -> int:
