@@ -193,7 +193,8 @@ def _session():
     return s
 
 
-def put_once(token: str, row: dict) -> tuple[int, str | None]:
+def put_once(token: str, row: dict) -> tuple[int, str | None, float]:
+    """Return (status, err, retry_after_seconds)."""
     H = {
         "Authorization": f"Bearer {token}",
         "Accept": ACCEPT_RETAILER,
@@ -202,36 +203,52 @@ def put_once(token: str, row: dict) -> tuple[int, str | None]:
     try:
         body = {"pricing": {"bundlePrices": bundle_prices(row["_price"])}}
     except Exception as e:
-        return -1, f"BODY: {str(e)[:120]}"
+        return -1, f"BODY: {str(e)[:120]}", 0.0
     try:
         r = _session().put(
             f"{API}/retailer/offers/{row['offerId']}/price",
             headers=H, json=body, timeout=(10, 45),
         )
         if 200 <= r.status_code < 300:
-            return 200, None
-        return r.status_code, r.text[:200]
+            return 200, None, 0.0
+        ra = 0.0
+        try:
+            ra = float(r.headers.get("Retry-After", "0") or 0)
+        except ValueError:
+            ra = 0.0
+        return r.status_code, r.text[:200], ra
     except Exception as e:
-        return 0, str(e)
+        return 0, str(e), 0.0
 
 
 _429_BACKOFF = float(os.environ.get("BOL_429_BACKOFF", "5"))
+_MAX_ATTEMPTS = int(os.environ.get("BOL_MAX_ATTEMPTS", "10"))
 
 
 def worker(row: dict, tm: TokenManager) -> tuple[dict, int, str | None]:
-    status, err = put_once(tm.get(), row)
-    if status == -1:                       # onbruikbare prijs -> niet retryen
+    """Robuuste retry: 429/5xx/netwerk net zo lang opnieuw tot success of attempts op.
+    429 wordt NIET als blijvende fout geteld zolang er attempts over zijn."""
+    last_status, last_err = 0, None
+    for attempt in range(_MAX_ATTEMPTS):
+        status, err, ra = put_once(tm.get(), row)
+        if status == 200:
+            return row, 200, None
+        if status == -1:                       # onbruikbare prijs -> niet retryen
+            return row, status, err
+        last_status, last_err = status, err
+        if status == 401:
+            tm.force_refresh()
+            continue
+        if status == 429:
+            wait = ra if ra > 0 else min(_429_BACKOFF * (attempt + 1), 30)
+            time.sleep(min(wait, 60))
+            continue
+        if status == 0 or status >= 500:       # netwerk / serverfout
+            time.sleep(min(2 + attempt * 2, 30))
+            continue
+        # harde 4xx -> niet retryen
         return row, status, err
-    if status == 401:
-        token = tm.force_refresh()
-        status, err = put_once(token, row)
-    if status == 429:
-        time.sleep(_429_BACKOFF)
-        status, err = put_once(tm.get(), row)
-    if status == 0 and err:
-        time.sleep(2)
-        status, err = put_once(tm.get(), row)
-    return row, status, err
+    return row, last_status, last_err
 
 
 def _price_of(row: dict) -> str:
