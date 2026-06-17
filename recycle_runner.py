@@ -46,9 +46,13 @@ class DataModel:
         self.chunks = {str(c["id"]): {a["id"]: a.get("enrichmentLevel", 9)
                                       for a in c.get("attributes", [])}
                        for c in d.get("chunks", [])}
+        self.names = {str(c["id"]): c.get("name", "") for c in d.get("chunks", [])}
 
     def allowed(self, chunk):
         return self.chunks.get(str(chunk), {})
+
+    def chunk_name(self, chunk):
+        return self.names.get(str(chunk), "")
 
     def title_id(self, chunk):
         a = self.allowed(chunk)
@@ -134,7 +138,7 @@ def _ean13(rng):
     return body + str((10 - s % 10) % 10)
 
 
-def build_body(new_ean, cat, images, gen_title, dm):
+def build_body(new_ean, cat, images, gen_title, dm, asin=""):
     out = [{"id": "EAN", "values": [{"value": new_ean}]}]
     chunk = (cat.get("gpc") or {}).get("chunkId")
     if chunk:
@@ -151,11 +155,18 @@ def build_body(new_ean, cat, images, gen_title, dm):
             continue
         if aid == "Brand":
             has_brand = True
-        out.append({"id": aid, "values": vals})
+        out.append({"id": aid, "values": vals[:300]})  # Bol: max 300 values per attribute
     if gen_title and title_id:
         out.append({"id": title_id, "values": [{"value": gen_title[:200]}]})
     if not has_brand and (not allowed or "Brand" in allowed):
         out.append({"id": "Brand", "values": [{"value": "Merkloos"}]})
+    # enrichmentLevel-0 verplichte velden die de bron-catalogus nooit teruggeeft (4004-fix)
+    present = {a["id"] for a in out}
+    cname = dm.chunk_name(chunk)
+    if cname and "Product Classification" not in present and (not allowed or "Product Classification" in allowed):
+        out.append({"id": "Product Classification", "values": [{"value": cname[:300]}]})
+    if asin and "Internal Reference" not in present and (not allowed or "Internal Reference" in allowed):
+        out.append({"id": "Internal Reference", "values": [{"value": str(asin)[:100]}]})
     body = {"language": "nl", "attributes": out}
     if images:
         body["assets"] = [{"url": u, "labels": ["FRONT" if i == 0 else "OTHER"]}
@@ -193,7 +204,7 @@ def recycle_one(tm, op_id, dm, cleaner, row, blocked, ean_lock, rng):
         while ne in blocked:
             ne = _ean13(rng)
         blocked.add(ne)
-    body = build_body(ne, cat, images, title, dm)
+    body = build_body(ne, cat, images, title, dm, asin)
     rp = _req(token, "POST", "/content/products", body)
     if rp.status_code not in (200, 202):
         return (ne, f"content_http_{rp.status_code}")
