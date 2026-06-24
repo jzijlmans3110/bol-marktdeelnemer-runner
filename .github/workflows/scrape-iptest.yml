@@ -1,0 +1,22 @@
+name: scrape-iptest
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: pip install requests
+      - name: scrape-test
+        env:
+          SHARD: ${{ matrix.shard }}
+          SHARD_COUNT: '4'
+        run: python iptest_scrape.py
