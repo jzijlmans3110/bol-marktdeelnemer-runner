@@ -6,3 +6,8 @@ secrets.json
 set_*_secrets.sh
 *_secrets.sh
 datamodel_v10_nl.json
+
+# Bol API creds (NOOIT committen)
+*_creds.json
+creds.json
+bol_accounts.json
