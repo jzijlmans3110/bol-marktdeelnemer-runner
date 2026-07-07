@@ -1,0 +1,480 @@
+name: bol-volumekorting-job
+
+on:
+  workflow_dispatch:
+    inputs:
+      workers: { description: 'Parallel workers per shard', default: '5', type: string }
+      shards:  { description: 'Aantal shards', default: '16', type: string }
+      backoff: { description: '429 backoff seconds', default: '10', type: string }
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: pip install -r requirements.txt
+      - name: Pull Bol CSV export
+        env:
+          BOL_NAME: fetch
+          BOL_FETCH_ONLY: '1'
+          JOB_CREDS_B64: ${{ secrets.JOB_CREDS_B64 }}
+          SHARD_IDX: '0'
+        run: |
+          echo "$JOB_CREDS_B64" | base64 -d > creds.json
+          export BOL_CLIENT_ID=$(python -c "import json;print(json.load(open('creds.json'))[$SHARD_IDX]['client_id'])")
+          export BOL_CLIENT_SECRET=$(python -c "import json;print(json.load(open('creds.json'))[$SHARD_IDX]['client_secret'])")
+          python volume_runner.py
+      - uses: actions/upload-artifact@v4
+        with: { name: bol-csv, path: ./bol_export.csv, retention-days: 1 }
+
+  s0:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    needs: fetch
+    if: ${{ fromJSON(inputs.shards) >= 1 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: pip install -r requirements.txt
+      - uses: actions/download-artifact@v4
+        with: { name: bol-csv }
+      - run: curl -s ifconfig.me; echo
+      - name: apply
+        env:
+          BOL_NAME: s0
+          BOL_SHARD: 0/${{ inputs.shards }}
+          BOL_WORKERS: ${{ inputs.workers }}
+          BOL_429_BACKOFF: ${{ inputs.backoff }}
+          BOL_USE_CACHE: '1'
+          JOB_CREDS_B64: ${{ secrets.JOB_CREDS_B64 }}
+          SHARD_IDX: '0'
+        run: |
+          echo "$JOB_CREDS_B64" | base64 -d > creds.json
+          export BOL_CLIENT_ID=$(python -c "import json;print(json.load(open('creds.json'))[$SHARD_IDX]['client_id'])")
+          export BOL_CLIENT_SECRET=$(python -c "import json;print(json.load(open('creds.json'))[$SHARD_IDX]['client_secret'])")
+          python volume_runner.py
+
+  s1:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    needs: fetch
+    if: ${{ fromJSON(inputs.shards) >= 2 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: pip install -r requirements.txt
+      - uses: actions/download-artifact@v4
+        with: { name: bol-csv }
+      - run: curl -s ifconfig.me; echo
+      - name: apply
+        env:
+          BOL_NAME: s1
+          BOL_SHARD: 1/${{ inputs.shards }}
+          BOL_WORKERS: ${{ inputs.workers }}
+          BOL_429_BACKOFF: ${{ inputs.backoff }}
+          BOL_USE_CACHE: '1'
+          JOB_CREDS_B64: ${{ secrets.JOB_CREDS_B64 }}
+          SHARD_IDX: '1'
+        run: |
+          echo "$JOB_CREDS_B64" | base64 -d > creds.json
+          export BOL_CLIENT_ID=$(python -c "import json;print(json.load(open('creds.json'))[$SHARD_IDX]['client_id'])")
+          export BOL_CLIENT_SECRET=$(python -c "import json;print(json.load(open('creds.json'))[$SHARD_IDX]['client_secret'])")
+          python volume_runner.py
+
+  s2:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    needs: fetch
+    if: ${{ fromJSON(inputs.shards) >= 3 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: pip install -r requirements.txt
+      - uses: actions/download-artifact@v4
+        with: { name: bol-csv }
+      - run: curl -s ifconfig.me; echo
+      - name: apply
+        env:
+          BOL_NAME: s2
+          BOL_SHARD: 2/${{ inputs.shards }}
+          BOL_WORKERS: ${{ inputs.workers }}
+          BOL_429_BACKOFF: ${{ inputs.backoff }}
+          BOL_USE_CACHE: '1'
+          JOB_CREDS_B64: ${{ secrets.JOB_CREDS_B64 }}
+          SHARD_IDX: '2'
+        run: |
+          echo "$JOB_CREDS_B64" | base64 -d > creds.json
+          export BOL_CLIENT_ID=$(python -c "import json;print(json.load(open('creds.json'))[$SHARD_IDX]['client_id'])")
+          export BOL_CLIENT_SECRET=$(python -c "import json;print(json.load(open('creds.json'))[$SHARD_IDX]['client_secret'])")
+          python volume_runner.py
+
+  s3:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    needs: fetch
+    if: ${{ fromJSON(inputs.shards) >= 4 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: pip install -r requirements.txt
+      - uses: actions/download-artifact@v4
+        with: { name: bol-csv }
+      - run: curl -s ifconfig.me; echo
+      - name: apply
+        env:
+          BOL_NAME: s3
+          BOL_SHARD: 3/${{ inputs.shards }}
+          BOL_WORKERS: ${{ inputs.workers }}
+          BOL_429_BACKOFF: ${{ inputs.backoff }}
+          BOL_USE_CACHE: '1'
+          JOB_CREDS_B64: ${{ secrets.JOB_CREDS_B64 }}
+          SHARD_IDX: '3'
+        run: |
+          echo "$JOB_CREDS_B64" | base64 -d > creds.json
+          export BOL_CLIENT_ID=$(python -c "import json;print(json.load(open('creds.json'))[$SHARD_IDX]['client_id'])")
+          export BOL_CLIENT_SECRET=$(python -c "import json;print(json.load(open('creds.json'))[$SHARD_IDX]['client_secret'])")
+          python volume_runner.py
+
+  s4:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    needs: fetch
+    if: ${{ fromJSON(inputs.shards) >= 5 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: pip install -r requirements.txt
+      - uses: actions/download-artifact@v4
+        with: { name: bol-csv }
+      - run: curl -s ifconfig.me; echo
+      - name: apply
+        env:
+          BOL_NAME: s4
+          BOL_SHARD: 4/${{ inputs.shards }}
+          BOL_WORKERS: ${{ inputs.workers }}
+          BOL_429_BACKOFF: ${{ inputs.backoff }}
+          BOL_USE_CACHE: '1'
+          JOB_CREDS_B64: ${{ secrets.JOB_CREDS_B64 }}
+          SHARD_IDX: '4'
+        run: |
+          echo "$JOB_CREDS_B64" | base64 -d > creds.json
+          export BOL_CLIENT_ID=$(python -c "import json;print(json.load(open('creds.json'))[$SHARD_IDX]['client_id'])")
+          export BOL_CLIENT_SECRET=$(python -c "import json;print(json.load(open('creds.json'))[$SHARD_IDX]['client_secret'])")
+          python volume_runner.py
+
+  s5:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    needs: fetch
+    if: ${{ fromJSON(inputs.shards) >= 6 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: pip install -r requirements.txt
+      - uses: actions/download-artifact@v4
+        with: { name: bol-csv }
+      - run: curl -s ifconfig.me; echo
+      - name: apply
+        env:
+          BOL_NAME: s5
+          BOL_SHARD: 5/${{ inputs.shards }}
+          BOL_WORKERS: ${{ inputs.workers }}
+          BOL_429_BACKOFF: ${{ inputs.backoff }}
+          BOL_USE_CACHE: '1'
+          JOB_CREDS_B64: ${{ secrets.JOB_CREDS_B64 }}
+          SHARD_IDX: '5'
+        run: |
+          echo "$JOB_CREDS_B64" | base64 -d > creds.json
+          export BOL_CLIENT_ID=$(python -c "import json;print(json.load(open('creds.json'))[$SHARD_IDX]['client_id'])")
+          export BOL_CLIENT_SECRET=$(python -c "import json;print(json.load(open('creds.json'))[$SHARD_IDX]['client_secret'])")
+          python volume_runner.py
+
+  s6:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    needs: fetch
+    if: ${{ fromJSON(inputs.shards) >= 7 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: pip install -r requirements.txt
+      - uses: actions/download-artifact@v4
+        with: { name: bol-csv }
+      - run: curl -s ifconfig.me; echo
+      - name: apply
+        env:
+          BOL_NAME: s6
+          BOL_SHARD: 6/${{ inputs.shards }}
+          BOL_WORKERS: ${{ inputs.workers }}
+          BOL_429_BACKOFF: ${{ inputs.backoff }}
+          BOL_USE_CACHE: '1'
+          JOB_CREDS_B64: ${{ secrets.JOB_CREDS_B64 }}
+          SHARD_IDX: '6'
+        run: |
+          echo "$JOB_CREDS_B64" | base64 -d > creds.json
+          export BOL_CLIENT_ID=$(python -c "import json;print(json.load(open('creds.json'))[$SHARD_IDX]['client_id'])")
+          export BOL_CLIENT_SECRET=$(python -c "import json;print(json.load(open('creds.json'))[$SHARD_IDX]['client_secret'])")
+          python volume_runner.py
+
+  s7:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    needs: fetch
+    if: ${{ fromJSON(inputs.shards) >= 8 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: pip install -r requirements.txt
+      - uses: actions/download-artifact@v4
+        with: { name: bol-csv }
+      - run: curl -s ifconfig.me; echo
+      - name: apply
+        env:
+          BOL_NAME: s7
+          BOL_SHARD: 7/${{ inputs.shards }}
+          BOL_WORKERS: ${{ inputs.workers }}
+          BOL_429_BACKOFF: ${{ inputs.backoff }}
+          BOL_USE_CACHE: '1'
+          JOB_CREDS_B64: ${{ secrets.JOB_CREDS_B64 }}
+          SHARD_IDX: '7'
+        run: |
+          echo "$JOB_CREDS_B64" | base64 -d > creds.json
+          export BOL_CLIENT_ID=$(python -c "import json;print(json.load(open('creds.json'))[$SHARD_IDX]['client_id'])")
+          export BOL_CLIENT_SECRET=$(python -c "import json;print(json.load(open('creds.json'))[$SHARD_IDX]['client_secret'])")
+          python volume_runner.py
+
+  s8:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    needs: fetch
+    if: ${{ fromJSON(inputs.shards) >= 9 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: pip install -r requirements.txt
+      - uses: actions/download-artifact@v4
+        with: { name: bol-csv }
+      - run: curl -s ifconfig.me; echo
+      - name: apply
+        env:
+          BOL_NAME: s8
+          BOL_SHARD: 8/${{ inputs.shards }}
+          BOL_WORKERS: ${{ inputs.workers }}
+          BOL_429_BACKOFF: ${{ inputs.backoff }}
+          BOL_USE_CACHE: '1'
+          JOB_CREDS_B64: ${{ secrets.JOB_CREDS_B64 }}
+          SHARD_IDX: '8'
+        run: |
+          echo "$JOB_CREDS_B64" | base64 -d > creds.json
+          export BOL_CLIENT_ID=$(python -c "import json;print(json.load(open('creds.json'))[$SHARD_IDX]['client_id'])")
+          export BOL_CLIENT_SECRET=$(python -c "import json;print(json.load(open('creds.json'))[$SHARD_IDX]['client_secret'])")
+          python volume_runner.py
+
+  s9:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    needs: fetch
+    if: ${{ fromJSON(inputs.shards) >= 10 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: pip install -r requirements.txt
+      - uses: actions/download-artifact@v4
+        with: { name: bol-csv }
+      - run: curl -s ifconfig.me; echo
+      - name: apply
+        env:
+          BOL_NAME: s9
+          BOL_SHARD: 9/${{ inputs.shards }}
+          BOL_WORKERS: ${{ inputs.workers }}
+          BOL_429_BACKOFF: ${{ inputs.backoff }}
+          BOL_USE_CACHE: '1'
+          JOB_CREDS_B64: ${{ secrets.JOB_CREDS_B64 }}
+          SHARD_IDX: '9'
+        run: |
+          echo "$JOB_CREDS_B64" | base64 -d > creds.json
+          export BOL_CLIENT_ID=$(python -c "import json;print(json.load(open('creds.json'))[$SHARD_IDX]['client_id'])")
+          export BOL_CLIENT_SECRET=$(python -c "import json;print(json.load(open('creds.json'))[$SHARD_IDX]['client_secret'])")
+          python volume_runner.py
+
+  s10:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    needs: fetch
+    if: ${{ fromJSON(inputs.shards) >= 11 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: pip install -r requirements.txt
+      - uses: actions/download-artifact@v4
+        with: { name: bol-csv }
+      - run: curl -s ifconfig.me; echo
+      - name: apply
+        env:
+          BOL_NAME: s10
+          BOL_SHARD: 10/${{ inputs.shards }}
+          BOL_WORKERS: ${{ inputs.workers }}
+          BOL_429_BACKOFF: ${{ inputs.backoff }}
+          BOL_USE_CACHE: '1'
+          JOB_CREDS_B64: ${{ secrets.JOB_CREDS_B64 }}
+          SHARD_IDX: '10'
+        run: |
+          echo "$JOB_CREDS_B64" | base64 -d > creds.json
+          export BOL_CLIENT_ID=$(python -c "import json;print(json.load(open('creds.json'))[$SHARD_IDX]['client_id'])")
+          export BOL_CLIENT_SECRET=$(python -c "import json;print(json.load(open('creds.json'))[$SHARD_IDX]['client_secret'])")
+          python volume_runner.py
+
+  s11:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    needs: fetch
+    if: ${{ fromJSON(inputs.shards) >= 12 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: pip install -r requirements.txt
+      - uses: actions/download-artifact@v4
+        with: { name: bol-csv }
+      - run: curl -s ifconfig.me; echo
+      - name: apply
+        env:
+          BOL_NAME: s11
+          BOL_SHARD: 11/${{ inputs.shards }}
+          BOL_WORKERS: ${{ inputs.workers }}
+          BOL_429_BACKOFF: ${{ inputs.backoff }}
+          BOL_USE_CACHE: '1'
+          JOB_CREDS_B64: ${{ secrets.JOB_CREDS_B64 }}
+          SHARD_IDX: '11'
+        run: |
+          echo "$JOB_CREDS_B64" | base64 -d > creds.json
+          export BOL_CLIENT_ID=$(python -c "import json;print(json.load(open('creds.json'))[$SHARD_IDX]['client_id'])")
+          export BOL_CLIENT_SECRET=$(python -c "import json;print(json.load(open('creds.json'))[$SHARD_IDX]['client_secret'])")
+          python volume_runner.py
+
+  s12:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    needs: fetch
+    if: ${{ fromJSON(inputs.shards) >= 13 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: pip install -r requirements.txt
+      - uses: actions/download-artifact@v4
+        with: { name: bol-csv }
+      - run: curl -s ifconfig.me; echo
+      - name: apply
+        env:
+          BOL_NAME: s12
+          BOL_SHARD: 12/${{ inputs.shards }}
+          BOL_WORKERS: ${{ inputs.workers }}
+          BOL_429_BACKOFF: ${{ inputs.backoff }}
+          BOL_USE_CACHE: '1'
+          JOB_CREDS_B64: ${{ secrets.JOB_CREDS_B64 }}
+          SHARD_IDX: '12'
+        run: |
+          echo "$JOB_CREDS_B64" | base64 -d > creds.json
+          export BOL_CLIENT_ID=$(python -c "import json;print(json.load(open('creds.json'))[$SHARD_IDX]['client_id'])")
+          export BOL_CLIENT_SECRET=$(python -c "import json;print(json.load(open('creds.json'))[$SHARD_IDX]['client_secret'])")
+          python volume_runner.py
+
+  s13:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    needs: fetch
+    if: ${{ fromJSON(inputs.shards) >= 14 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: pip install -r requirements.txt
+      - uses: actions/download-artifact@v4
+        with: { name: bol-csv }
+      - run: curl -s ifconfig.me; echo
+      - name: apply
+        env:
+          BOL_NAME: s13
+          BOL_SHARD: 13/${{ inputs.shards }}
+          BOL_WORKERS: ${{ inputs.workers }}
+          BOL_429_BACKOFF: ${{ inputs.backoff }}
+          BOL_USE_CACHE: '1'
+          JOB_CREDS_B64: ${{ secrets.JOB_CREDS_B64 }}
+          SHARD_IDX: '13'
+        run: |
+          echo "$JOB_CREDS_B64" | base64 -d > creds.json
+          export BOL_CLIENT_ID=$(python -c "import json;print(json.load(open('creds.json'))[$SHARD_IDX]['client_id'])")
+          export BOL_CLIENT_SECRET=$(python -c "import json;print(json.load(open('creds.json'))[$SHARD_IDX]['client_secret'])")
+          python volume_runner.py
+
+  s14:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    needs: fetch
+    if: ${{ fromJSON(inputs.shards) >= 15 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: pip install -r requirements.txt
+      - uses: actions/download-artifact@v4
+        with: { name: bol-csv }
+      - run: curl -s ifconfig.me; echo
+      - name: apply
+        env:
+          BOL_NAME: s14
+          BOL_SHARD: 14/${{ inputs.shards }}
+          BOL_WORKERS: ${{ inputs.workers }}
+          BOL_429_BACKOFF: ${{ inputs.backoff }}
+          BOL_USE_CACHE: '1'
+          JOB_CREDS_B64: ${{ secrets.JOB_CREDS_B64 }}
+          SHARD_IDX: '14'
+        run: |
+          echo "$JOB_CREDS_B64" | base64 -d > creds.json
+          export BOL_CLIENT_ID=$(python -c "import json;print(json.load(open('creds.json'))[$SHARD_IDX]['client_id'])")
+          export BOL_CLIENT_SECRET=$(python -c "import json;print(json.load(open('creds.json'))[$SHARD_IDX]['client_secret'])")
+          python volume_runner.py
+
+  s15:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    needs: fetch
+    if: ${{ fromJSON(inputs.shards) >= 16 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: pip install -r requirements.txt
+      - uses: actions/download-artifact@v4
+        with: { name: bol-csv }
+      - run: curl -s ifconfig.me; echo
+      - name: apply
+        env:
+          BOL_NAME: s15
+          BOL_SHARD: 15/${{ inputs.shards }}
+          BOL_WORKERS: ${{ inputs.workers }}
+          BOL_429_BACKOFF: ${{ inputs.backoff }}
+          BOL_USE_CACHE: '1'
+          JOB_CREDS_B64: ${{ secrets.JOB_CREDS_B64 }}
+          SHARD_IDX: '15'
+        run: |
+          echo "$JOB_CREDS_B64" | base64 -d > creds.json
+          export BOL_CLIENT_ID=$(python -c "import json;print(json.load(open('creds.json'))[$SHARD_IDX]['client_id'])")
+          export BOL_CLIENT_SECRET=$(python -c "import json;print(json.load(open('creds.json'))[$SHARD_IDX]['client_secret'])")
+          python volume_runner.py
+
