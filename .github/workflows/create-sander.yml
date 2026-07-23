@@ -1,0 +1,347 @@
+name: bol-create-sander
+
+on:
+  workflow_dispatch:
+    inputs:
+      workers: { description: workers per shard, default: "15", type: string }
+      shards:  { description: aantal shards, default: "16", type: string }
+      backoff: { description: 429 backoff sec, default: "5", type: string }
+      limit:   { description: test-limiet per shard (0=alles), default: "0", type: string }
+
+jobs:
+  s0:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    if: ${{ fromJSON(inputs.shards) >= 1 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - run: pip install -r requirements.txt
+      - run: curl -s ifconfig.me; echo
+      - run: python create_runner.py
+        env:
+          BOL_NAME: s0
+          BOL_SHARD: 0/${{ inputs.shards }}
+          BOL_WORKERS: ${{ inputs.workers }}
+          BOL_429_BACKOFF: ${{ inputs.backoff }}
+          BOL_LIMIT: ${{ inputs.limit }}
+          BOL_LIST_FILE: lists/sander_create.csv.gz
+          BOL_CLIENT_ID: ${{ secrets.SANDER1_CLIENT_ID }}
+          BOL_CLIENT_SECRET: ${{ secrets.SANDER1_CLIENT_SECRET }}
+
+  s1:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    if: ${{ fromJSON(inputs.shards) >= 2 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - run: pip install -r requirements.txt
+      - run: curl -s ifconfig.me; echo
+      - run: python create_runner.py
+        env:
+          BOL_NAME: s1
+          BOL_SHARD: 1/${{ inputs.shards }}
+          BOL_WORKERS: ${{ inputs.workers }}
+          BOL_429_BACKOFF: ${{ inputs.backoff }}
+          BOL_LIMIT: ${{ inputs.limit }}
+          BOL_LIST_FILE: lists/sander_create.csv.gz
+          BOL_CLIENT_ID: ${{ secrets.SANDER2_CLIENT_ID }}
+          BOL_CLIENT_SECRET: ${{ secrets.SANDER2_CLIENT_SECRET }}
+
+  s2:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    if: ${{ fromJSON(inputs.shards) >= 3 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - run: pip install -r requirements.txt
+      - run: curl -s ifconfig.me; echo
+      - run: python create_runner.py
+        env:
+          BOL_NAME: s2
+          BOL_SHARD: 2/${{ inputs.shards }}
+          BOL_WORKERS: ${{ inputs.workers }}
+          BOL_429_BACKOFF: ${{ inputs.backoff }}
+          BOL_LIMIT: ${{ inputs.limit }}
+          BOL_LIST_FILE: lists/sander_create.csv.gz
+          BOL_CLIENT_ID: ${{ secrets.SANDER3_CLIENT_ID }}
+          BOL_CLIENT_SECRET: ${{ secrets.SANDER3_CLIENT_SECRET }}
+
+  s3:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    if: ${{ fromJSON(inputs.shards) >= 4 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - run: pip install -r requirements.txt
+      - run: curl -s ifconfig.me; echo
+      - run: python create_runner.py
+        env:
+          BOL_NAME: s3
+          BOL_SHARD: 3/${{ inputs.shards }}
+          BOL_WORKERS: ${{ inputs.workers }}
+          BOL_429_BACKOFF: ${{ inputs.backoff }}
+          BOL_LIMIT: ${{ inputs.limit }}
+          BOL_LIST_FILE: lists/sander_create.csv.gz
+          BOL_CLIENT_ID: ${{ secrets.SANDER4_CLIENT_ID }}
+          BOL_CLIENT_SECRET: ${{ secrets.SANDER4_CLIENT_SECRET }}
+
+  s4:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    if: ${{ fromJSON(inputs.shards) >= 5 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - run: pip install -r requirements.txt
+      - run: curl -s ifconfig.me; echo
+      - run: python create_runner.py
+        env:
+          BOL_NAME: s4
+          BOL_SHARD: 4/${{ inputs.shards }}
+          BOL_WORKERS: ${{ inputs.workers }}
+          BOL_429_BACKOFF: ${{ inputs.backoff }}
+          BOL_LIMIT: ${{ inputs.limit }}
+          BOL_LIST_FILE: lists/sander_create.csv.gz
+          BOL_CLIENT_ID: ${{ secrets.SANDER5_CLIENT_ID }}
+          BOL_CLIENT_SECRET: ${{ secrets.SANDER5_CLIENT_SECRET }}
+
+  s5:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    if: ${{ fromJSON(inputs.shards) >= 6 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - run: pip install -r requirements.txt
+      - run: curl -s ifconfig.me; echo
+      - run: python create_runner.py
+        env:
+          BOL_NAME: s5
+          BOL_SHARD: 5/${{ inputs.shards }}
+          BOL_WORKERS: ${{ inputs.workers }}
+          BOL_429_BACKOFF: ${{ inputs.backoff }}
+          BOL_LIMIT: ${{ inputs.limit }}
+          BOL_LIST_FILE: lists/sander_create.csv.gz
+          BOL_CLIENT_ID: ${{ secrets.SANDER6_CLIENT_ID }}
+          BOL_CLIENT_SECRET: ${{ secrets.SANDER6_CLIENT_SECRET }}
+
+  s6:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    if: ${{ fromJSON(inputs.shards) >= 7 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - run: pip install -r requirements.txt
+      - run: curl -s ifconfig.me; echo
+      - run: python create_runner.py
+        env:
+          BOL_NAME: s6
+          BOL_SHARD: 6/${{ inputs.shards }}
+          BOL_WORKERS: ${{ inputs.workers }}
+          BOL_429_BACKOFF: ${{ inputs.backoff }}
+          BOL_LIMIT: ${{ inputs.limit }}
+          BOL_LIST_FILE: lists/sander_create.csv.gz
+          BOL_CLIENT_ID: ${{ secrets.SANDER7_CLIENT_ID }}
+          BOL_CLIENT_SECRET: ${{ secrets.SANDER7_CLIENT_SECRET }}
+
+  s7:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    if: ${{ fromJSON(inputs.shards) >= 8 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - run: pip install -r requirements.txt
+      - run: curl -s ifconfig.me; echo
+      - run: python create_runner.py
+        env:
+          BOL_NAME: s7
+          BOL_SHARD: 7/${{ inputs.shards }}
+          BOL_WORKERS: ${{ inputs.workers }}
+          BOL_429_BACKOFF: ${{ inputs.backoff }}
+          BOL_LIMIT: ${{ inputs.limit }}
+          BOL_LIST_FILE: lists/sander_create.csv.gz
+          BOL_CLIENT_ID: ${{ secrets.SANDER8_CLIENT_ID }}
+          BOL_CLIENT_SECRET: ${{ secrets.SANDER8_CLIENT_SECRET }}
+
+  s8:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    if: ${{ fromJSON(inputs.shards) >= 9 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - run: pip install -r requirements.txt
+      - run: curl -s ifconfig.me; echo
+      - run: python create_runner.py
+        env:
+          BOL_NAME: s8
+          BOL_SHARD: 8/${{ inputs.shards }}
+          BOL_WORKERS: ${{ inputs.workers }}
+          BOL_429_BACKOFF: ${{ inputs.backoff }}
+          BOL_LIMIT: ${{ inputs.limit }}
+          BOL_LIST_FILE: lists/sander_create.csv.gz
+          BOL_CLIENT_ID: ${{ secrets.SANDER9_CLIENT_ID }}
+          BOL_CLIENT_SECRET: ${{ secrets.SANDER9_CLIENT_SECRET }}
+
+  s9:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    if: ${{ fromJSON(inputs.shards) >= 10 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - run: pip install -r requirements.txt
+      - run: curl -s ifconfig.me; echo
+      - run: python create_runner.py
+        env:
+          BOL_NAME: s9
+          BOL_SHARD: 9/${{ inputs.shards }}
+          BOL_WORKERS: ${{ inputs.workers }}
+          BOL_429_BACKOFF: ${{ inputs.backoff }}
+          BOL_LIMIT: ${{ inputs.limit }}
+          BOL_LIST_FILE: lists/sander_create.csv.gz
+          BOL_CLIENT_ID: ${{ secrets.SANDER10_CLIENT_ID }}
+          BOL_CLIENT_SECRET: ${{ secrets.SANDER10_CLIENT_SECRET }}
+
+  s10:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    if: ${{ fromJSON(inputs.shards) >= 11 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - run: pip install -r requirements.txt
+      - run: curl -s ifconfig.me; echo
+      - run: python create_runner.py
+        env:
+          BOL_NAME: s10
+          BOL_SHARD: 10/${{ inputs.shards }}
+          BOL_WORKERS: ${{ inputs.workers }}
+          BOL_429_BACKOFF: ${{ inputs.backoff }}
+          BOL_LIMIT: ${{ inputs.limit }}
+          BOL_LIST_FILE: lists/sander_create.csv.gz
+          BOL_CLIENT_ID: ${{ secrets.SANDER11_CLIENT_ID }}
+          BOL_CLIENT_SECRET: ${{ secrets.SANDER11_CLIENT_SECRET }}
+
+  s11:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    if: ${{ fromJSON(inputs.shards) >= 12 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - run: pip install -r requirements.txt
+      - run: curl -s ifconfig.me; echo
+      - run: python create_runner.py
+        env:
+          BOL_NAME: s11
+          BOL_SHARD: 11/${{ inputs.shards }}
+          BOL_WORKERS: ${{ inputs.workers }}
+          BOL_429_BACKOFF: ${{ inputs.backoff }}
+          BOL_LIMIT: ${{ inputs.limit }}
+          BOL_LIST_FILE: lists/sander_create.csv.gz
+          BOL_CLIENT_ID: ${{ secrets.SANDER12_CLIENT_ID }}
+          BOL_CLIENT_SECRET: ${{ secrets.SANDER12_CLIENT_SECRET }}
+
+  s12:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    if: ${{ fromJSON(inputs.shards) >= 13 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - run: pip install -r requirements.txt
+      - run: curl -s ifconfig.me; echo
+      - run: python create_runner.py
+        env:
+          BOL_NAME: s12
+          BOL_SHARD: 12/${{ inputs.shards }}
+          BOL_WORKERS: ${{ inputs.workers }}
+          BOL_429_BACKOFF: ${{ inputs.backoff }}
+          BOL_LIMIT: ${{ inputs.limit }}
+          BOL_LIST_FILE: lists/sander_create.csv.gz
+          BOL_CLIENT_ID: ${{ secrets.SANDER13_CLIENT_ID }}
+          BOL_CLIENT_SECRET: ${{ secrets.SANDER13_CLIENT_SECRET }}
+
+  s13:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    if: ${{ fromJSON(inputs.shards) >= 14 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - run: pip install -r requirements.txt
+      - run: curl -s ifconfig.me; echo
+      - run: python create_runner.py
+        env:
+          BOL_NAME: s13
+          BOL_SHARD: 13/${{ inputs.shards }}
+          BOL_WORKERS: ${{ inputs.workers }}
+          BOL_429_BACKOFF: ${{ inputs.backoff }}
+          BOL_LIMIT: ${{ inputs.limit }}
+          BOL_LIST_FILE: lists/sander_create.csv.gz
+          BOL_CLIENT_ID: ${{ secrets.SANDER14_CLIENT_ID }}
+          BOL_CLIENT_SECRET: ${{ secrets.SANDER14_CLIENT_SECRET }}
+
+  s14:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    if: ${{ fromJSON(inputs.shards) >= 15 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - run: pip install -r requirements.txt
+      - run: curl -s ifconfig.me; echo
+      - run: python create_runner.py
+        env:
+          BOL_NAME: s14
+          BOL_SHARD: 14/${{ inputs.shards }}
+          BOL_WORKERS: ${{ inputs.workers }}
+          BOL_429_BACKOFF: ${{ inputs.backoff }}
+          BOL_LIMIT: ${{ inputs.limit }}
+          BOL_LIST_FILE: lists/sander_create.csv.gz
+          BOL_CLIENT_ID: ${{ secrets.SANDER15_CLIENT_ID }}
+          BOL_CLIENT_SECRET: ${{ secrets.SANDER15_CLIENT_SECRET }}
+
+  s15:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    if: ${{ fromJSON(inputs.shards) >= 16 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - run: pip install -r requirements.txt
+      - run: curl -s ifconfig.me; echo
+      - run: python create_runner.py
+        env:
+          BOL_NAME: s15
+          BOL_SHARD: 15/${{ inputs.shards }}
+          BOL_WORKERS: ${{ inputs.workers }}
+          BOL_429_BACKOFF: ${{ inputs.backoff }}
+          BOL_LIMIT: ${{ inputs.limit }}
+          BOL_LIST_FILE: lists/sander_create.csv.gz
+          BOL_CLIENT_ID: ${{ secrets.SANDER16_CLIENT_ID }}
+          BOL_CLIENT_SECRET: ${{ secrets.SANDER16_CLIENT_SECRET }}
+
